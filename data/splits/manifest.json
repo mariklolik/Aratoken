@@ -1,0 +1,63 @@
+{
+  "source": {
+    "repo": "epfml/FineWeb2-HQ",
+    "config": "arb_Arab",
+    "shards_read": 29,
+    "shards_total": 85,
+    "shard_stride": 3
+  },
+  "split_rule": {
+    "hash": "blake2b(id, digest_size=8) % 1000",
+    "buckets": {
+      "lm-train": [
+        0,
+        600
+      ],
+      "tok-train": [
+        600,
+        900
+      ],
+      "dev": [
+        900,
+        950
+      ],
+      "test": [
+        950,
+        1000
+      ]
+    },
+    "note": "Disjoint by construction: each document id maps to exactly one bucket, independent of read order or budgets."
+  },
+  "filters": {
+    "min_chars": 200,
+    "min_quality": 0.0
+  },
+  "splits": {
+    "lm-train": {
+      "docs": 662685,
+      "chars": 2000000759,
+      "budget_chars": 2000000000,
+      "approx_tokens": 512820707
+    },
+    "tok-train": {
+      "docs": 159826,
+      "chars": 480001125,
+      "budget_chars": 480000000,
+      "approx_tokens": 123077211
+    },
+    "dev": {
+      "docs": 2522,
+      "chars": 8000072,
+      "budget_chars": 8000000,
+      "approx_tokens": 2051300
+    },
+    "test": {
+      "docs": 6602,
+      "chars": 20001350,
+      "budget_chars": 20000000,
+      "approx_tokens": 5128551
+    }
+  },
+  "unique_ids_seen": 1103313,
+  "elapsed_sec": 2632.5
+}
