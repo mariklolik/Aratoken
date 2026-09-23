@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use AraToken or LEP, please cite the paper below."
+title: "AraToken: Optimizing Arabic Tokenization with Normalization Pipeline and Language Extension for Qwen3"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/mariklolik/Aratoken"
+authors:
+  - family-names: Kashirskiy
+    given-names: Mark
+    affiliation: "HSE University; ITMO University"
+  - family-names: Lipinski
+    given-names: Artiom
+    affiliation: "Saint Petersburg State University"
+  - family-names: Makarov
+    given-names: Ilya
+    affiliation: "Trusted AI Center, RAS"
+preferred-citation:
+  type: article
+  title: "AraToken: Optimizing Arabic Tokenization with Normalization Pipeline and Language Extension for Qwen3"
+  authors:
+    - family-names: Kashirskiy
+      given-names: Mark
+    - family-names: Lipinski
+      given-names: Artiom
+    - family-names: Makarov
+      given-names: Ilya
+  year: 2025
+  identifiers:
+    - type: other
+      value: "arXiv:2512.18399"
+  url: "https://arxiv.org/abs/2512.18399"

@@ -2,8 +2,14 @@
 
 All experiments use the Arabic part (`arb_Arab`) of
 [FineWeb2-HQ](https://huggingface.co/datasets/epfml/FineWeb2-HQ), which is released under ODC-By 1.0.
-The corpus text is not copied into this repository. It is downloaded from the Hugging Face Hub and split
-by `scripts/data/build_splits.py`.
+The corpus text is not stored in this repository. The paper's exact splits are on the Hugging Face Hub
+at [mariklolik/AraToken-FineWeb2-HQ-ar](https://huggingface.co/datasets/mariklolik/AraToken-FineWeb2-HQ-ar):
+
+```bash
+hf download mariklolik/AraToken-FineWeb2-HQ-ar --repo-type dataset --local-dir data/fineweb2hq-ar
+```
+
+`scripts/data/build_splits.py` rebuilds the splits from FineWeb2-HQ.
 
 ## Split rule
 
@@ -18,7 +24,7 @@ by construction.
 | `dev` | 900–949 | training-loss monitoring | 2,522 | 8 M |
 | `test` | 950–999 | every reported measurement | 6,602 | 20 M |
 
-The builder reads every third parquet shard and stops each split at its character budget. Worker
+When rebuilt, the builder reads every third parquet shard and stops each split at its character budget. Worker
 threads decide which documents reach a budget first, so the exact membership of `lm-train` and
 `tok-train` can differ from one rebuild to the next. The evaluation splits are released exactly:
 
