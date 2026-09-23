@@ -1,0 +1,14 @@
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+data/fineweb2hq-ar/
+data/pretokenized/
+models/
+outputs/
+tokenizers/extended/
+tokenizers/fw2hq_bpe_*/
+tokenizers/fw2hq_wp_*/
+tokenizers/fw2hq_sp_drop*/
+tokenizers/fw2hq_sp_keep*/
+tokenizers/*/freq.csv
