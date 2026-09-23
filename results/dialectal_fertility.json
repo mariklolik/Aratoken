@@ -1,0 +1,191 @@
+{
+  "AraToken-150k-alif-preserve": {
+    "vocab_size": 150000,
+    "msa_test": {
+      "fertility_mean": 1.2128251432074915,
+      "fertility_std": 0.0935408982416954,
+      "unk_rate": 0.0016772847805831806,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.211761651201751,
+      "fertility_std": 0.09098215174121788,
+      "unk_rate": 0.0019079486441849593,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.358702552656462,
+      "fertility_std": 1.3065712398595817,
+      "unk_rate": 0.050763167496189615,
+      "n_docs": 2089
+    }
+  },
+  "AraToken-150k-alif-preserve-bytes": {
+    "vocab_size": 150000,
+    "msa_test": {
+      "fertility_mean": 1.2159218939233205,
+      "fertility_std": 0.09968811722025685,
+      "unk_rate": 0.0,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.2149424048677486,
+      "fertility_std": 0.09713229212814632,
+      "unk_rate": 0.0,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.5061457507969154,
+      "fertility_std": 2.839693428541461,
+      "unk_rate": 0.0,
+      "n_docs": 2089
+    }
+  },
+  "AraToken-150k-alif-unified": {
+    "vocab_size": 150000,
+    "msa_test": {
+      "fertility_mean": 1.207989199914946,
+      "fertility_std": 0.09083531601198125,
+      "unk_rate": 0.0017535559875440315,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.2070292753206115,
+      "fertility_std": 0.0893614724058218,
+      "unk_rate": 0.0020634312068966696,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.3319701509122748,
+      "fertility_std": 1.3022042878659146,
+      "unk_rate": 0.05152846000486652,
+      "n_docs": 2089
+    }
+  },
+  "AraToken-99pct-alif-unified": {
+    "vocab_size": 109067,
+    "msa_test": {
+      "fertility_mean": 1.2221917385802175,
+      "fertility_std": 0.09452721960803455,
+      "unk_rate": 0.001734552411034718,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.2222521191506461,
+      "fertility_std": 0.09425774906098941,
+      "unk_rate": 0.002039789520248977,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.3779880758571843,
+      "fertility_std": 1.3385700613173017,
+      "unk_rate": 0.05047202900179205,
+      "n_docs": 2089
+    }
+  },
+  "AraToken-95pct-alif-unified": {
+    "vocab_size": 59134,
+    "msa_test": {
+      "fertility_mean": 1.274932769123717,
+      "fertility_std": 0.10850396304545147,
+      "unk_rate": 0.001661789117195055,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.2758902350636419,
+      "fertility_std": 0.10873796616585032,
+      "unk_rate": 0.001953991500947716,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.532549270525059,
+      "fertility_std": 1.4506092828679547,
+      "unk_rate": 0.04736744558126164,
+      "n_docs": 2089
+    }
+  },
+  "AraToken-99pct-alif-preserve": {
+    "vocab_size": 109844,
+    "msa_test": {
+      "fertility_mean": 1.2274161941294093,
+      "fertility_std": 0.09725637179263272,
+      "unk_rate": 0.0016581419416519024,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.2271800126807366,
+      "fertility_std": 0.09563922138855532,
+      "unk_rate": 0.001887390792116692,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.40438694099788,
+      "fertility_std": 1.3430989017666901,
+      "unk_rate": 0.04975187539186942,
+      "n_docs": 2089
+    }
+  },
+  "AraToken-95pct-alif-preserve": {
+    "vocab_size": 60149,
+    "msa_test": {
+      "fertility_mean": 1.2811578749229695,
+      "fertility_std": 0.11087700313769809,
+      "unk_rate": 0.0015883594117617873,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.2821131101812306,
+      "fertility_std": 0.10979223547466198,
+      "unk_rate": 0.0018062647544796113,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 2.5630843035274493,
+      "fertility_std": 1.457808416105206,
+      "unk_rate": 0.04664688161773844,
+      "n_docs": 2089
+    }
+  },
+  "AraBERT": {
+    "vocab_size": 64000,
+    "msa_test": {
+      "fertility_mean": 1.8348969480567752,
+      "fertility_std": 0.1487993001243434,
+      "unk_rate": 0.0023736024816858182,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 1.8383019788645647,
+      "fertility_std": 0.14521732923643715,
+      "unk_rate": 0.002478693292099976,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 3.0028650898385094,
+      "fertility_std": 1.5613517544062123,
+      "unk_rate": 0.038417413877640236,
+      "n_docs": 2089
+    }
+  },
+  "Qwen3": {
+    "vocab_size": 151669,
+    "msa_test": {
+      "fertility_mean": 2.1801110880886942,
+      "fertility_std": 0.17351699329154568,
+      "unk_rate": 0.0,
+      "n_docs": 3000
+    },
+    "msa_low_quality_band": {
+      "fertility_mean": 2.1802437322971087,
+      "fertility_std": 0.17344974715254488,
+      "unk_rate": 0.0,
+      "n_docs": 1650
+    },
+    "dialectal_arsarcasm": {
+      "fertility_mean": 3.2045587922711634,
+      "fertility_std": 1.5277711695689342,
+      "unk_rate": 0.0,
+      "n_docs": 2089
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "source": "data/fineweb2hq-ar/test",
+  "lang": "ar",
+  "n_docs": 1500,
+  "max_len": 1024,
+  "seed": 42,
+  "results": {
+    "base": {
+      "bpc": {
+        "mean": 1.5445639305042205,
+        "std": 0.27907280283059416,
+        "ci_lower": 1.5305309076011318,
+        "ci_upper": 1.5587432290166092,
+        "n_docs": 1500,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.5224423923706327,
+      "total_chars": 2127940,
+      "total_tokens": 821358,
+      "chars_per_token": 2.590758232098549,
+      "vocab_size": 151669,
+      "model_path": "Qwen/Qwen3-0.6B-Base",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "flagship_preserve_500M": {
+      "bpc": {
+        "mean": 1.3218839489858991,
+        "std": 0.2728767288326123,
+        "ci_lower": 1.308068031108718,
+        "ci_upper": 1.3360671135091151,
+        "n_docs": 1500,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.3155000457455077,
+      "total_chars": 2679667,
+      "total_tokens": 604931,
+      "chars_per_token": 4.429706859129388,
+      "vocab_size": 282826,
+      "model_path": "outputs/flagship/preserve_s1/model/checkpoint-5086",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    },
+    "flagship_cpt_500M": {
+      "bpc": {
+        "mean": 1.4047212520104013,
+        "std": 0.27675068355916854,
+        "ci_lower": 1.3908187526026987,
+        "ci_upper": 1.4189827291155275,
+        "n_docs": 1500,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.3882748535777383,
+      "total_chars": 2127940,
+      "total_tokens": 821358,
+      "chars_per_token": 2.590758232098549,
+      "vocab_size": 151669,
+      "model_path": "outputs/flagship/cpt_s1/model/checkpoint-5086",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "cpt_equaltext_s1": {
+      "bpc": {
+        "mean": 1.417017130323014,
+        "std": 0.27667739287757614,
+        "ci_lower": 1.4031106236897448,
+        "ci_upper": 1.4313048628137592,
+        "n_docs": 1500,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.3998559040863199,
+      "total_chars": 2127940,
+      "total_tokens": 821358,
+      "chars_per_token": 2.590758232098549,
+      "vocab_size": 151669,
+      "model_path": "outputs/grid/baseline_cpt_equaltext_s1/model/checkpoint-3584",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "cpt_equaltext_s2": {
+      "bpc": {
+        "mean": 1.4169686848673653,
+        "std": 0.2772570191135792,
+        "ci_lower": 1.4030920327633996,
+        "ci_upper": 1.4311785431999096,
+        "n_docs": 1500,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.399865441080764,
+      "total_chars": 2127940,
+      "total_tokens": 821358,
+      "chars_per_token": 2.590758232098549,
+      "vocab_size": 151669,
+      "model_path": "outputs/grid/baseline_cpt_equaltext_s2/model/checkpoint-3584",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "cpt_equaltext_s3": {
+      "bpc": {
+        "mean": 1.4170634883955238,
+        "std": 0.2766047396387866,
+        "ci_lower": 1.4032491214370053,
+        "ci_upper": 1.4313068350399278,
+        "n_docs": 1500,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.3999595804955387,
+      "total_chars": 2127940,
+      "total_tokens": 821358,
+      "chars_per_token": 2.590758232098549,
+      "vocab_size": 151669,
+      "model_path": "outputs/grid/baseline_cpt_equaltext_s3/model/checkpoint-3584",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    }
+  }
+}

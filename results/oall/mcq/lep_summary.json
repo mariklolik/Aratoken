@@ -1,0 +1,12 @@
+{
+  "model": "outputs/flagship/preserve_s1/model/checkpoint-5086",
+  "tag": "lep",
+  "accuracy": {
+    "ArabicMMLU": 0.332,
+    "MadinahQA": 0.3889457523029683,
+    "ArabicEXAMS": 0.3333333333333333,
+    "AraTrust": 0.5644329896907216,
+    "AlGhafa": 0.40612592172433354,
+    "macro": 0.4049675994102714
+  }
+}

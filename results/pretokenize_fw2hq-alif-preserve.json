@@ -1,0 +1,18 @@
+{
+  "tokenizer": "lep/tokenizers/fw2hq-alif-preserve-150k",
+  "vocab_size": 282826,
+  "block_size": 1024,
+  "splits_dir": "data/fineweb2hq-ar",
+  "train_split": "lm-train",
+  "val_split": "dev",
+  "blocks": {
+    "train": 437835,
+    "validation": 1734
+  },
+  "tokens": {
+    "train": 448343040,
+    "validation": 1775616
+  },
+  "eos_terminated": true,
+  "python_side_normalization": false
+}

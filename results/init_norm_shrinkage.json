@@ -1,0 +1,49 @@
+{
+  "base_model": "Qwen/Qwen3-0.6B-Base",
+  "tokenizer": "lep/tokenizers/fw2hq-alif-preserve-150k",
+  "donor_radius_mean": 0.9066370725631714,
+  "donor_radius_std": 0.15676723420619965,
+  "new_tokens_measured": 20000,
+  "subtokens_per_token_mean": 2.99515,
+  "mean_init_radius": 0.5423366105988622,
+  "mean_init_ratio_to_donor": 0.5981849044244482,
+  "tied_embeddings": true,
+  "by_subtoken_count": {
+    "1": {
+      "n_tokens": 259,
+      "radius": 0.8100015178150192,
+      "ratio_to_donor": 0.8934131885044675,
+      "uncorrelated_prediction": 1.0
+    },
+    "2": {
+      "n_tokens": 4979,
+      "radius": 0.6015425099201723,
+      "ratio_to_donor": 0.6634876601941059,
+      "uncorrelated_prediction": 0.7071067811865476
+    },
+    "3": {
+      "n_tokens": 10201,
+      "radius": 0.5318730830205514,
+      "ratio_to_donor": 0.5866438723014961,
+      "uncorrelated_prediction": 0.5773502691896257
+    },
+    "4": {
+      "n_tokens": 3846,
+      "radius": 0.49061212255132736,
+      "ratio_to_donor": 0.5411339745509284,
+      "uncorrelated_prediction": 0.5
+    },
+    "5": {
+      "n_tokens": 613,
+      "radius": 0.46392120919258717,
+      "ratio_to_donor": 0.5116945062493711,
+      "uncorrelated_prediction": 0.4472135954999579
+    },
+    "6": {
+      "n_tokens": 84,
+      "radius": 0.4434641361946151,
+      "ratio_to_donor": 0.48913082159864585,
+      "uncorrelated_prediction": 0.408248290463863
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "source": "results/grid_bpc_scale17.json",
+  "baseline": "__base_qwen3_1.7b",
+  "metric": "bits-per-character (lower is better); negative mean_diff favours the configuration",
+  "correction": "Holm-Bonferroni across all configurations vs baseline",
+  "comparisons": {
+    "scale17full_cpt": {
+      "mean_diff": -0.06404015266666666,
+      "ci_lower": -0.06707098025000001,
+      "ci_upper": -0.06134370725,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000,
+      "n_seeds": 1,
+      "practically_meaningful": true,
+      "p_raw": 0.0,
+      "p_holm": 0.0,
+      "reject_at_0.05": true
+    },
+    "scale17fix_lep": {
+      "mean_diff": -0.042514411333333335,
+      "ci_lower": -0.047820720166666664,
+      "ci_upper": -0.03733434371666666,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000,
+      "n_seeds": 1,
+      "practically_meaningful": true,
+      "p_raw": 0.0,
+      "p_holm": 0.0,
+      "reject_at_0.05": true
+    },
+    "scale17hyb_lep": {
+      "mean_diff": -0.071449586,
+      "ci_lower": -0.07668554215000001,
+      "ci_upper": -0.06647434048333334,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000,
+      "n_seeds": 1,
+      "practically_meaningful": true,
+      "p_raw": 0.0,
+      "p_holm": 0.0,
+      "reject_at_0.05": true
+    }
+  },
+  "factorial_contrasts": {},
+  "pairwise_contrasts": {
+    "scale17hyb_lep_minus_scale17full_cpt": {
+      "mean_diff": -0.007409433333333335,
+      "ci_lower": -0.011192107216666669,
+      "ci_upper": -0.0037717333000000033,
+      "p_value": 0.0001,
+      "n_items": 1500,
+      "n_bootstrap": 10000
+    },
+    "scale17hyb_lep_minus_scale17fix_lep": {
+      "mean_diff": -0.028935174666666667,
+      "ci_lower": -0.02999848381666667,
+      "ci_upper": -0.027859779166666668,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000
+    }
+  }
+}

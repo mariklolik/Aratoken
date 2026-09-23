@@ -1,0 +1,9 @@
+{
+  "model": "outputs/flagship/cpt_s1/model/checkpoint-5086",
+  "tag": "cpt",
+  "accuracy": {
+    "MMLU": 0.509,
+    "ARC-Easy": 0.809,
+    "macro": 0.659
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "tag": "base",
+  "accuracy": {
+    "ArabicMMLU": 0.345,
+    "MadinahQA": 0.38382804503582396,
+    "ArabicEXAMS": 0.29236499068901306,
+    "AraTrust": 0.5283505154639175,
+    "AlGhafa": 0.4083947816222348,
+    "macro": 0.3915876665621979
+  }
+}

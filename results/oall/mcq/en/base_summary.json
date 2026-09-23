@@ -1,0 +1,9 @@
+{
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "tag": "base",
+  "accuracy": {
+    "MMLU": 0.518,
+    "ARC-Easy": 0.815,
+    "macro": 0.6665
+  }
+}

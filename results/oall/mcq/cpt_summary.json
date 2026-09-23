@@ -1,0 +1,12 @@
+{
+  "model": "outputs/flagship/cpt_s1/model/checkpoint-5086",
+  "tag": "cpt",
+  "accuracy": {
+    "ArabicMMLU": 0.328,
+    "MadinahQA": 0.38178096212896623,
+    "ArabicEXAMS": 0.2849162011173184,
+    "AraTrust": 0.48195876288659795,
+    "AlGhafa": 0.4163357912648894,
+    "macro": 0.37859834347955446
+  }
+}

@@ -1,0 +1,1429 @@
+{
+  "split": "data/fineweb2hq-ar/test",
+  "n_docs": 5000,
+  "seed": 42,
+  "fertility_definition": "tokens per whitespace-delimited word (str.split())",
+  "conventions": {
+    "macro": "per-document mean, bootstrap CI over documents (primary)",
+    "micro": "corpus aggregate: total tokens / total words"
+  },
+  "results": {
+    "AraToken-150k-alif-preserve": {
+      "vocab_size": 150000,
+      "note": "Alif variants preserved (the paper's default pipeline)",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_preserve/sentencepiece.model",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.3663427562978445,
+            "std": 0.50328534680942,
+            "ci_lower": 1.3527708708883253,
+            "ci_upper": 1.3804413093059744,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.484711014603373,
+            "std": 0.6518045198303483,
+            "ci_lower": 4.466201003792505,
+            "ci_upper": 4.50342927368297,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.5199821593644103,
+          "compression": 3.8696865658663735
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3990663,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2122612274264428,
+            "std": 0.09243204687013394,
+            "ci_lower": 1.2096863622665446,
+            "ci_upper": 1.2148562684200426,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.801682035763745,
+            "std": 0.3941936555625003,
+            "ci_lower": 4.790615828455849,
+            "ci_upper": 4.812847411678515,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.23556816073046,
+          "compression": 4.635843671213021
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3242525,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2122612274264428,
+            "std": 0.09243204687013394,
+            "ci_lower": 1.2096863622665446,
+            "ci_upper": 1.2148562684200426,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.801682035763745,
+            "std": 0.3941936555625003,
+            "ci_lower": 4.790615828455849,
+            "ci_upper": 4.812847411678515,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.23556816073046,
+          "compression": 4.635843671213021
+        },
+        "oov_rate_percent": 0.2762775609147461,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3242525,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.8921015971749765
+    },
+    "AraToken-150k-alif-preserve-bytes": {
+      "vocab_size": 150000,
+      "note": "byte fallback, so no token is unknown; the recommended build",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_preserve_bf/sentencepiece.model",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.511708268147554,
+            "std": 0.8362410425262424,
+            "ci_lower": 1.489170059699192,
+            "ci_upper": 1.535005309448835,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.1913287780312585,
+            "std": 0.7383495224428261,
+            "ci_lower": 4.170511303589828,
+            "ci_upper": 4.212290866382707,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.7525247889232658,
+          "compression": 3.3562176008150924
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4601196,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2152386922580898,
+            "std": 0.09837351959958783,
+            "ci_lower": 1.2125449897662952,
+            "ci_upper": 1.2179716464880688,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.792186515875385,
+            "std": 0.40268016392237355,
+            "ci_lower": 4.780789905853178,
+            "ci_upper": 4.8034611536972225,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.2385110194301836,
+          "compression": 4.624828320792751
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3250248,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2152386922580898,
+            "std": 0.09837351959958783,
+            "ci_lower": 1.2125449897662952,
+            "ci_upper": 1.2179716464880688,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.792186515875385,
+            "std": 0.40268016392237355,
+            "ci_lower": 4.780789905853178,
+            "ci_upper": 4.8034611536972225,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.2385110194301836,
+          "compression": 4.624828320792751
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3250248,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.8940097839116208
+    },
+    "AraToken-150k-alif-unified": {
+      "vocab_size": 150000,
+      "note": "Alif unified. This is what the published Table 4 actually measured, despite the text presenting preservation as the default.",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_unified/sentencepiece.model",
+      "own_input": "norm_unified",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.6790627977751629,
+            "std": 0.4775697648758445,
+            "ci_lower": 1.6661157088522296,
+            "ci_upper": 1.692561439554437,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.605904588488306,
+            "std": 0.49383682081160807,
+            "ci_lower": 3.5922485916324702,
+            "ci_upper": 3.619964053166524,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.8172142327441174,
+          "compression": 3.236742502047773
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4771036,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.531889508270825,
+            "std": 0.1336386941661453,
+            "ci_lower": 1.5282042683958321,
+            "ci_upper": 1.5355239896150465,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.8085686724584504,
+            "std": 0.36994333547160113,
+            "ci_lower": 3.7983753103577893,
+            "ci_upper": 3.81894240059496,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.5495543796314397,
+          "compression": 3.6964826233700765
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4066525,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2074060853707909,
+            "std": 0.0899251989808234,
+            "ci_lower": 1.2049006029805516,
+            "ci_upper": 1.2099272196279862,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.819914681045584,
+            "std": 0.39004667795401166,
+            "ci_lower": 4.809002052847881,
+            "ci_upper": 4.830955948425936,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.2302894579508055,
+          "compression": 4.655734308099429
+        },
+        "oov_rate_percent": 0.2776143878223981,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3228672,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.8885573589918035
+    },
+    "AraToken-99pct-alif-unified": {
+      "vocab_size": 109067,
+      "note": "99% cumulative coverage",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_unified_0_99/sentencepiece.model",
+      "own_input": "norm_unified",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.6931056562206461,
+            "std": 0.4766102063692659,
+            "ci_lower": 1.6801861110008425,
+            "ci_upper": 1.7065909993549275,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.574257461797561,
+            "std": 0.4863229300711626,
+            "ci_lower": 3.5608572708552386,
+            "ci_upper": 3.5880419793145983,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.8284533761041368,
+          "compression": 3.2168468823533334
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4800544,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.5471305792435848,
+            "std": 0.13565652885177346,
+            "ci_lower": 1.543403729261759,
+            "ci_upper": 1.5508418988070498,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.770957399064028,
+            "std": 0.36428819369045623,
+            "ci_lower": 3.760886466799598,
+            "ci_upper": 3.781191378878719,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.5620402854988285,
+          "compression": 3.6669354122614344
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4099292,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2218786082514332,
+            "std": 0.0940512534269154,
+            "ci_lower": 1.2192387002421874,
+            "ci_upper": 1.224507059003315,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.763893659600144,
+            "std": 0.38882878670666937,
+            "ci_lower": 4.753026398444646,
+            "ci_upper": 4.774833704315112,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.2420003056030917,
+          "compression": 4.611835288956113
+        },
+        "oov_rate_percent": 0.2776143878223981,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3259405,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.8970356691612401
+    },
+    "AraToken-95pct-alif-unified": {
+      "vocab_size": 59134,
+      "note": "95% cumulative coverage",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_unified_0_95/sentencepiece.model",
+      "own_input": "norm_unified",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.74764769283965,
+            "std": 0.47534562718245404,
+            "ci_lower": 1.734697972815168,
+            "ci_upper": 1.7610479359180256,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.458155464915027,
+            "std": 0.46364325148055485,
+            "ci_lower": 3.4454570269647045,
+            "ci_upper": 3.471103575456337,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.880279584546292,
+          "compression": 3.128180825229935
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4936612,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.604495650038286,
+            "std": 0.14381743550611567,
+            "ci_lower": 1.6005147510753353,
+            "ci_upper": 1.6083974941733539,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.6365370783520468,
+            "std": 0.3496926748059841,
+            "ci_lower": 3.626889937608897,
+            "ci_upper": 3.6464166140347536,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.6182594417828016,
+          "compression": 3.5395442105156576
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4246829,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2749361147548506,
+            "std": 0.10830777020101966,
+            "ci_lower": 1.271905237845696,
+            "ci_upper": 1.2779612251281114,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.570132539020008,
+            "std": 0.3933315284377213,
+            "ci_lower": 4.559118128008577,
+            "ci_upper": 4.581100127292991,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.2945411743008377,
+          "compression": 4.424657131024178
+        },
+        "oov_rate_percent": 0.2776143878223981,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3397289,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.9354002656558784
+    },
+    "AraToken-99pct-alif-preserve": {
+      "vocab_size": 109844,
+      "note": "99% cumulative coverage",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_preserve_0_99/sentencepiece.model",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.3799005151318944,
+            "std": 0.502526762608509,
+            "ci_lower": 1.3663583852113044,
+            "ci_upper": 1.3939028703543173,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.437855308924028,
+            "std": 0.6420873213491288,
+            "ci_lower": 4.419650726688403,
+            "ci_upper": 4.456214362768082,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.5306869216028995,
+          "compression": 3.8426241574532294
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4018768,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2270250173960071,
+            "std": 0.09647253038259283,
+            "ci_lower": 1.2243375898077662,
+            "ci_upper": 1.2297362653267594,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.744967382572345,
+            "std": 0.39297737578800357,
+            "ci_lower": 4.733907827424436,
+            "ci_upper": 4.7560657131853565,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.247551841068102,
+          "compression": 4.591312881531741
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3273974,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.2270250173960071,
+            "std": 0.09647253038259283,
+            "ci_lower": 1.2243375898077662,
+            "ci_upper": 1.2297362653267594,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.744967382572345,
+            "std": 0.39297737578800357,
+            "ci_lower": 4.733907827424436,
+            "ci_upper": 4.7560657131853565,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.247551841068102,
+          "compression": 4.591312881531741
+        },
+        "oov_rate_percent": 0.2762775609147461,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3273974,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.9010075485145949
+    },
+    "AraToken-95pct-alif-preserve": {
+      "vocab_size": 60149,
+      "note": "95% cumulative coverage; the scale-matched comparison against AraBERT's 64k",
+      "source": "tokenizer/data/tokenizers/fw2hq_sp_alif_preserve_0_95/sentencepiece.model",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.4312216697023938,
+            "std": 0.501916720307304,
+            "ci_lower": 1.4176058035013448,
+            "ci_upper": 1.445237606065748,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.27187261724283,
+            "std": 0.6158664666017436,
+            "ci_lower": 4.254548899691801,
+            "ci_upper": 4.289564038731165,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.5790981185442436,
+          "compression": 3.7248189161744096
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4145870,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.281167746381627,
+            "std": 0.11025494843547991,
+            "ci_lower": 1.2781109827458428,
+            "ci_upper": 1.284234798893162,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.54872455132318,
+            "std": 0.39615358289997715,
+            "ci_lower": 4.537536411069836,
+            "ci_upper": 4.559861017714918,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3002626586173403,
+          "compression": 4.40518752139317
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3412304,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.281167746381627,
+            "std": 0.11025494843547991,
+            "ci_lower": 1.2781109827458428,
+            "ci_upper": 1.284234798893162,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.54872455132318,
+            "std": 0.39615358289997715,
+            "ci_lower": 4.537536411069836,
+            "ci_upper": 4.559861017714918,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3002626586173403,
+          "compression": 4.40518752139317
+        },
+        "oov_rate_percent": 0.2762775609147461,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 3412304,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.9397349920627207
+    },
+    "LEP-Qwen3+AraToken-alif-preserve": {
+      "vocab_size": 282826,
+      "note": "",
+      "source": "lep/tokenizers/fw2hq-alif-preserve-150k",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.3066450749420506,
+            "std": 0.12064978593694105,
+            "ci_lower": 1.3032954193384476,
+            "ci_upper": 1.3100503431038018,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.520710654321783,
+            "std": 0.4161060147959689,
+            "ci_lower": 4.508911752418226,
+            "ci_upper": 4.532493055986385,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3173762991498275,
+          "compression": 4.464824929858607
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3458728,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.306811481393397,
+            "std": 0.1206972952565309,
+            "ci_lower": 1.3034541639651522,
+            "ci_upper": 1.31021467692687,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.463552828326782,
+            "std": 0.41052564810568687,
+            "ci_lower": 4.451982467496618,
+            "ci_upper": 4.4749184673545725,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3179476275559487,
+          "compression": 4.346076216166987
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3458715,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.306811481393397,
+            "std": 0.1206972952565309,
+            "ci_lower": 1.3034541639651522,
+            "ci_upper": 1.31021467692687,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.463552828326782,
+            "std": 0.41052564810568687,
+            "ci_lower": 4.451982467496618,
+            "ci_upper": 4.4749184673545725,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3179476275559487,
+          "compression": 4.346076216166987
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3458715,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.9520426345287848
+    },
+    "LEP-Qwen3+AraToken-alif-unified": {
+      "vocab_size": 281798,
+      "note": "",
+      "source": "lep/tokenizers/fw2hq-alif-unified-150k",
+      "own_input": "norm_unified",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.3012011263969017,
+            "std": 0.1190690709441319,
+            "ci_lower": 1.2978795556640372,
+            "ci_upper": 1.304585736112433,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.53913790456713,
+            "std": 0.41599603501204113,
+            "ci_lower": 4.5273363213247375,
+            "ci_upper": 4.55080740204962,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.311940694741164,
+          "compression": 4.483323496272416
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3444457,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.3013660934624778,
+            "std": 0.11910626211131996,
+            "ci_lower": 1.298050995469857,
+            "ci_upper": 1.304740278104424,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.4816008001300025,
+            "std": 0.40899584524130683,
+            "ci_lower": 4.470079805902661,
+            "ci_upper": 4.492924551767898,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3125096453594247,
+          "compression": 4.3640828534300455
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3444444,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.3013660934624778,
+            "std": 0.11910626211131996,
+            "ci_lower": 1.298050995469857,
+            "ci_upper": 1.304740278104424,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 4.4816008001300025,
+            "std": 0.40899584524130683,
+            "ci_lower": 4.470079805902661,
+            "ci_upper": 4.492924551767898,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.3125096453594247,
+          "compression": 4.3640828534300455
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 3444444,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 0.9479930022353971
+    },
+    "Qwen2.5": {
+      "vocab_size": 151665,
+      "note": "",
+      "source": "Qwen/Qwen2.5-0.5B",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 2.2827869560624716,
+            "std": 0.46160933225269507,
+            "ci_lower": 2.270176160103797,
+            "ci_upper": 2.2957169241951734,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.613372698633218,
+            "std": 0.2487168836602025,
+            "ci_lower": 2.606469012420803,
+            "ci_upper": 2.6203711208278895,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.361908186238867,
+          "compression": 2.490297707894971
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 6201112,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 2.1791266543901444,
+            "std": 0.1729154033639089,
+            "ci_lower": 2.174392269746384,
+            "ci_upper": 2.183850315067799,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.6688258207787805,
+            "std": 0.17530680528873477,
+            "ci_lower": 2.664025563086176,
+            "ci_upper": 2.6737582057291647,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.1487220113103627,
+          "compression": 2.665724466973533
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5638932,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 2.1791266543901444,
+            "std": 0.1729154033639089,
+            "ci_lower": 2.174392269746384,
+            "ci_upper": 2.183850315067799,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.6688258207787805,
+            "std": 0.17530680528873477,
+            "ci_lower": 2.664025563086176,
+            "ci_upper": 2.6737582057291647,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.1487220113103627,
+          "compression": 2.665724466973533
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5638932,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 1.5739009297955746
+    },
+    "Qwen3": {
+      "vocab_size": 151669,
+      "note": "",
+      "source": "Qwen/Qwen3-0.6B-Base",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 2.2827869560624716,
+            "std": 0.46160933225269507,
+            "ci_lower": 2.270176160103797,
+            "ci_upper": 2.2957169241951734,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.613372698633218,
+            "std": 0.2487168836602025,
+            "ci_lower": 2.606469012420803,
+            "ci_upper": 2.6203711208278895,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.361908186238867,
+          "compression": 2.490297707894971
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 6201112,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 2.1791266543901444,
+            "std": 0.1729154033639089,
+            "ci_lower": 2.174392269746384,
+            "ci_upper": 2.183850315067799,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.6688258207787805,
+            "std": 0.17530680528873477,
+            "ci_lower": 2.664025563086176,
+            "ci_upper": 2.6737582057291647,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.1487220113103627,
+          "compression": 2.665724466973533
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5638932,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 2.1791266543901444,
+            "std": 0.1729154033639089,
+            "ci_lower": 2.174392269746384,
+            "ci_upper": 2.183850315067799,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.6688258207787805,
+            "std": 0.17530680528873477,
+            "ci_lower": 2.664025563086176,
+            "ci_upper": 2.6737582057291647,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.1487220113103627,
+          "compression": 2.665724466973533
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5638932,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 1.5739009297955746
+    },
+    "DeepSeek-V3": {
+      "vocab_size": 128815,
+      "note": "",
+      "source": "deepseek-ai/DeepSeek-V3",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 2.2384125478547334,
+            "std": 0.3102071247399967,
+            "ci_lower": 2.2299857784559083,
+            "ci_upper": 2.247023144312973,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.6441570403201244,
+            "std": 0.19212912658695058,
+            "ci_lower": 2.638829136350308,
+            "ci_upper": 2.6495213261015196,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.263226313642487,
+          "compression": 2.5988804155350382
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5942026,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 2.1769165203352028,
+            "std": 0.1657267333180383,
+            "ci_lower": 2.1724253549201795,
+            "ci_upper": 2.1814455643888304,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.669622376914728,
+            "std": 0.15438416226777893,
+            "ci_lower": 2.6654099369543647,
+            "ci_upper": 2.6738824221681106,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.137793461846673,
+          "compression": 2.679351836601992
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5610252,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 2.1769165203352028,
+            "std": 0.1657267333180383,
+            "ci_lower": 2.1724253549201795,
+            "ci_upper": 2.1814455643888304,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 2.669622376914728,
+            "std": 0.15438416226777893,
+            "ci_lower": 2.6654099369543647,
+            "ci_upper": 2.6738824221681106,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 2.137793461846673,
+          "compression": 2.679351836601992
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 5610252,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 1.5693297048627985
+    },
+    "AraBERT": {
+      "vocab_size": 64000,
+      "note": "",
+      "source": "aubmindlab/bert-base-arabertv2",
+      "own_input": "norm",
+      "raw": {
+        "macro": {
+          "fertility": {
+            "mean": 1.7960035631979197,
+            "std": 0.1616170194067799,
+            "ci_lower": 1.7916754006843079,
+            "ci_upper": 1.800533391776988,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.2918725755603,
+            "std": 0.3884150692929281,
+            "ci_lower": 3.281313408470008,
+            "ci_upper": 3.3028767529868044,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.778304202642806,
+          "compression": 3.3075637642354834
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4668879,
+          "words": 2625467,
+          "chars": 15442615,
+          "docs": 5000
+        }
+      },
+      "normalized": {
+        "macro": {
+          "fertility": {
+            "mean": 1.8327036617370112,
+            "std": 0.14778994337939894,
+            "ci_lower": 1.828683507368067,
+            "ci_upper": 1.8368135632773073,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.1701222699155913,
+            "std": 0.14900239692828068,
+            "ci_lower": 3.1659974040739054,
+            "ci_upper": 3.1742635976588147,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.8330892700163357,
+          "compression": 3.124725528628276
+        },
+        "oov_rate_percent": 0.0,
+        "oov_words_scored": 0,
+        "totals": {
+          "tokens": 4810611,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "own_norm": {
+        "macro": {
+          "fertility": {
+            "mean": 1.8327036617370112,
+            "std": 0.14778994337939894,
+            "ci_lower": 1.828683507368067,
+            "ci_upper": 1.8368135632773073,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          },
+          "compression": {
+            "mean": 3.1701222699155913,
+            "std": 0.14900239692828068,
+            "ci_lower": 3.1659974040739054,
+            "ci_upper": 3.1742635976588147,
+            "ci_level": 0.95,
+            "n_docs": 5000,
+            "n_bootstrap": 10000
+          }
+        },
+        "micro": {
+          "fertility": 1.8330892700163357,
+          "compression": 3.124725528628276
+        },
+        "oov_rate_percent": 0.37431153414255924,
+        "oov_words_scored": 224412,
+        "totals": {
+          "tokens": 4810611,
+          "words": 2624319,
+          "chars": 15031839,
+          "docs": 5000
+        }
+      },
+      "tokens_per_morpheme": 1.3238409952376324
+    }
+  }
+}

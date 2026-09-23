@@ -1,0 +1,120 @@
+{
+  "config": {
+    "n_gram": 5,
+    "num_perm": 112,
+    "bands": 14,
+    "rows_per_band": 8,
+    "threshold": 0.72,
+    "reference": "RefinedWeb/FineWeb MinHash settings"
+  },
+  "indexed_train_docs": {
+    "tok-train": 159826,
+    "lm-train": 662685
+  },
+  "test_docs": 6602,
+  "near_duplicate_docs": 43,
+  "near_duplicate_rate": 0.006513177824901545,
+  "within_test_exact_duplicates": 0,
+  "examples": [
+    {
+      "test_id": "<urn:uuid:dd00bea1-4c3f-416e-af76-91cdd6d7d214>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:b8eb1d50-6bc4-48f6-8058-5996efe66837>"
+    },
+    {
+      "test_id": "<urn:uuid:f1162ced-be1a-4d09-b9eb-3adc45c510f4>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:59ed7ba4-be28-4121-9ee7-14d6e6c31404>"
+    },
+    {
+      "test_id": "<urn:uuid:ff200f20-39e1-4e45-8d4f-1c16fe42740d>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:5b75d326-0680-4e37-9c05-8e574d45066c>"
+    },
+    {
+      "test_id": "<urn:uuid:3b470bb5-d7c4-4caf-bfb8-6a3a1ffcdcf2>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:14b9ab70-c5b4-4374-a915-517e0b5cdc1c>"
+    },
+    {
+      "test_id": "<urn:uuid:db5844ed-013b-45c5-88fe-4e49e6dcf25a>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:72d23fc7-3913-4771-aaa4-b639035e094d>"
+    },
+    {
+      "test_id": "<urn:uuid:fca3e02e-471e-41f9-8c4a-402e421f0b91>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:cd280f37-5b20-4974-b64f-3cb9cd3527d3>"
+    },
+    {
+      "test_id": "<urn:uuid:f33ccdd8-fa2e-4110-905b-ab02810ea90f>",
+      "n_matches": 1,
+      "example": "tok-train/<urn:uuid:93f556c5-4d7c-43a1-9692-357a35b89c87>"
+    },
+    {
+      "test_id": "<urn:uuid:5c65d114-b418-4a15-85f9-9c85bda1115d>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:aed59b61-9764-4a43-bede-93d9c292bf5a>"
+    },
+    {
+      "test_id": "<urn:uuid:1a45ab5c-1ce0-4ffd-97a5-6afc1dc77f24>",
+      "n_matches": 3,
+      "example": "lm-train/<urn:uuid:b0f57d8c-7f94-4f2a-a5d2-c2396e10d30c>"
+    },
+    {
+      "test_id": "<urn:uuid:f2ed57df-1967-4a8b-9f97-939e3a0efd1c>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:dae75b55-9bc5-4ced-9bb4-7ca549ccd261>"
+    },
+    {
+      "test_id": "<urn:uuid:f0d45987-1656-409b-9cca-6969c78d8d89>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:6146ac2a-b22d-40da-9a63-0408ee77cf79>"
+    },
+    {
+      "test_id": "<urn:uuid:092b8dbe-2cd4-465f-8d2f-93b96c4c3923>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:dc558419-1b66-4338-855b-de15e92c9a1d>"
+    },
+    {
+      "test_id": "<urn:uuid:c15769e6-cf9b-4040-8938-3a2961fe1723>",
+      "n_matches": 9,
+      "example": "lm-train/<urn:uuid:73276008-8840-461e-ba9d-59314a68288d>"
+    },
+    {
+      "test_id": "<urn:uuid:15dac869-6df6-4f84-89ad-8ad6bc0706a5>",
+      "n_matches": 1,
+      "example": "tok-train/<urn:uuid:f9c2ff4a-1ac6-469c-bd41-844ea1728a4d>"
+    },
+    {
+      "test_id": "<urn:uuid:a3c35086-5bfe-4b3d-a8c1-1528bd25e697>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:6ffee12a-b316-4802-82b1-80f2b7763736>"
+    },
+    {
+      "test_id": "<urn:uuid:90f799d5-c1ff-4760-a943-eb0ba736e66f>",
+      "n_matches": 1,
+      "example": "tok-train/<urn:uuid:ab75ac0d-450d-43e1-9b31-b0b79d66f42f>"
+    },
+    {
+      "test_id": "<urn:uuid:abaf198a-90f6-4dfc-9b46-87dbf6216f4c>",
+      "n_matches": 1,
+      "example": "tok-train/<urn:uuid:e784e78e-3771-4a10-8d6c-4c1a2d570655>"
+    },
+    {
+      "test_id": "<urn:uuid:d68d56f1-951f-4bbc-90b4-5aa86f7408fc>",
+      "n_matches": 1,
+      "example": "lm-train/<urn:uuid:86953716-d9ff-4ced-ab7f-affeba1a66f2>"
+    },
+    {
+      "test_id": "<urn:uuid:a900d19c-1210-435e-96d3-c66ba1362383>",
+      "n_matches": 13,
+      "example": "tok-train/<urn:uuid:0189dabd-d437-4ac6-951f-ec05893e7e5c>"
+    },
+    {
+      "test_id": "<urn:uuid:66e308da-e3ff-4ad6-804f-6629ade6106e>",
+      "n_matches": 1,
+      "example": "tok-train/<urn:uuid:2099c78c-1a82-47cd-bcc1-027acda13231>"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "source": "results/grid_bpc_flagship_paired.json",
+  "baseline": "__base_qwen3_0.6b",
+  "metric": "bits-per-character (lower is better); negative mean_diff favours the configuration",
+  "correction": "Holm-Bonferroni across all configurations vs baseline",
+  "comparisons": {
+    "cpt": {
+      "mean_diff": -0.139842674,
+      "ci_lower": -0.14422190573333332,
+      "ci_upper": -0.13581817836666665,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000,
+      "n_seeds": 1,
+      "practically_meaningful": true,
+      "p_raw": 0.0,
+      "p_holm": 0.0,
+      "reject_at_0.05": true
+    },
+    "preserve": {
+      "mean_diff": -0.22267997733333333,
+      "ci_lower": -0.22917211380000002,
+      "ci_upper": -0.21635851041666668,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000,
+      "n_seeds": 1,
+      "practically_meaningful": true,
+      "p_raw": 0.0,
+      "p_holm": 0.0,
+      "reject_at_0.05": true
+    }
+  },
+  "factorial_contrasts": {},
+  "pairwise_contrasts": {
+    "preserve_minus_cpt": {
+      "mean_diff": -0.08283730333333333,
+      "ci_lower": -0.08688315453333333,
+      "ci_upper": -0.07902034663333334,
+      "p_value": 0.0,
+      "n_items": 1500,
+      "n_bootstrap": 10000
+    }
+  }
+}

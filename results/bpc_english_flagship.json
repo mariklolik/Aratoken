@@ -1,0 +1,60 @@
+{
+  "source": "wikitext/wikitext-103-raw-v1:test",
+  "lang": "en",
+  "n_docs": 1000,
+  "max_len": 1024,
+  "seed": 42,
+  "results": {
+    "base": {
+      "bpc": {
+        "mean": 1.01988587269937,
+        "std": 0.14882317821202645,
+        "ci_lower": 1.0106787363604512,
+        "ci_upper": 1.0290067338238442,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 0.996737227195949,
+      "total_chars": 755372,
+      "total_tokens": 175411,
+      "chars_per_token": 4.306297780640895,
+      "vocab_size": 151669,
+      "model_path": "Qwen/Qwen3-0.6B-Base",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "flagship_cpt_500M": {
+      "bpc": {
+        "mean": 1.0675429549044926,
+        "std": 0.1524505736162559,
+        "ci_lower": 1.0580758590721264,
+        "ci_upper": 1.0768988698538635,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.0413002806036202,
+      "total_chars": 755372,
+      "total_tokens": 175411,
+      "chars_per_token": 4.306297780640895,
+      "vocab_size": 151669,
+      "model_path": "outputs/flagship/cpt_s1/model/checkpoint-5086",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "flagship_preserve_500M": {
+      "bpc": {
+        "mean": 1.1378865087834702,
+        "std": 0.16177721073348095,
+        "ci_lower": 1.1280805193119496,
+        "ci_upper": 1.1477529191097777,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.106743881056969,
+      "total_chars": 755372,
+      "total_tokens": 178599,
+      "chars_per_token": 4.229430175980829,
+      "vocab_size": 282826,
+      "model_path": "outputs/flagship/preserve_s1/model/checkpoint-5086",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    }
+  }
+}

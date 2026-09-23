@@ -1,0 +1,128 @@
+{
+  "source": "wikitext/wikitext-103-raw-v1:test",
+  "lang": "en",
+  "n_docs": 1000,
+  "max_len": 1024,
+  "seed": 42,
+  "results": {
+    "base": {
+      "bpc": {
+        "mean": 1.01988587269937,
+        "std": 0.14882317821202645,
+        "ci_lower": 1.0106787363604512,
+        "ci_upper": 1.0290067338238442,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 0.996737227195949,
+      "total_chars": 755372,
+      "total_tokens": 175411,
+      "chars_per_token": 4.306297780640895,
+      "vocab_size": 151669,
+      "model_path": "Qwen/Qwen3-0.6B-Base",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    },
+    "trainable_L27_s1": {
+      "bpc": {
+        "mean": 1.1169110920733405,
+        "std": 0.1597641853940935,
+        "ci_lower": 1.1071263956420083,
+        "ci_upper": 1.1266427091840214,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.086364750088103,
+      "total_chars": 755372,
+      "total_tokens": 178599,
+      "chars_per_token": 4.229430175980829,
+      "vocab_size": 282826,
+      "model_path": "outputs/grid/trainable_L27_s1/model/checkpoint-2000",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    },
+    "trainable_L24_27_s1": {
+      "bpc": {
+        "mean": 1.1313246462359432,
+        "std": 0.16082152450524473,
+        "ci_lower": 1.1215797973468975,
+        "ci_upper": 1.141214585745786,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.100343448070519,
+      "total_chars": 755372,
+      "total_tokens": 178599,
+      "chars_per_token": 4.229430175980829,
+      "vocab_size": 282826,
+      "model_path": "outputs/grid/trainable_L24_27_s1/model/checkpoint-2000",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    },
+    "trainable_L18_27_s1": {
+      "bpc": {
+        "mean": 1.1622494079128516,
+        "std": 0.16134020453896206,
+        "ci_lower": 1.1522540578908234,
+        "ci_upper": 1.1722849213173898,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.1313634420793446,
+      "total_chars": 755372,
+      "total_tokens": 178599,
+      "chars_per_token": 4.229430175980829,
+      "vocab_size": 282826,
+      "model_path": "outputs/grid/trainable_L18_27_s1/model/checkpoint-2000",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    },
+    "trainable_L9_27_s1": {
+      "bpc": {
+        "mean": 1.1779038985682928,
+        "std": 0.16090725983845125,
+        "ci_lower": 1.1679111142968521,
+        "ci_upper": 1.1878171128702057,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.14697337018269,
+      "total_chars": 755372,
+      "total_tokens": 178599,
+      "chars_per_token": 4.229430175980829,
+      "vocab_size": 282826,
+      "model_path": "outputs/grid/trainable_L9_27_s1/model/checkpoint-2000",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    },
+    "trainable_all_s1": {
+      "bpc": {
+        "mean": 1.185754984417987,
+        "std": 0.1622233287663101,
+        "ci_lower": 1.1757228550804828,
+        "ci_upper": 1.1957461471095832,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.1549446144839985,
+      "total_chars": 755372,
+      "total_tokens": 178599,
+      "chars_per_token": 4.229430175980829,
+      "vocab_size": 282826,
+      "model_path": "outputs/grid/trainable_all_s1/model/checkpoint-2000",
+      "tokenizer_path": "lep/tokenizers/fw2hq-alif-preserve-150k"
+    },
+    "cpt_origtok": {
+      "bpc": {
+        "mean": 1.0549399339582881,
+        "std": 0.15276901864000242,
+        "ci_lower": 1.0454842050447573,
+        "ci_upper": 1.0643307980267787,
+        "n_docs": 1000,
+        "n_bootstrap": 10000
+      },
+      "corpus_bpc": 1.0288843009881237,
+      "total_chars": 755372,
+      "total_tokens": 175411,
+      "chars_per_token": 4.306297780640895,
+      "vocab_size": 151669,
+      "model_path": "outputs/grid/baseline_cpt_origtok_s1/model/checkpoint-2000",
+      "tokenizer_path": "Qwen/Qwen3-0.6B-Base"
+    }
+  }
+}

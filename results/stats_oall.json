@@ -1,0 +1,206 @@
+{
+  "per_task": {
+    "AlGhafa": {
+      "base:cpt": {
+        "delta_accuracy": -0.007941009642654595,
+        "ci_lower": -0.023255813953488358,
+        "ci_upper": 0.006806579693703907,
+        "p_value": 0.3,
+        "n_items": 1763,
+        "n_bootstrap": 2000
+      },
+      "base:lep": {
+        "delta_accuracy": 0.0022688598979012653,
+        "ci_lower": -0.023255813953488358,
+        "ci_upper": 0.02665910380034031,
+        "p_value": 0.848,
+        "n_items": 1763,
+        "n_bootstrap": 2000
+      },
+      "cpt:lep": {
+        "delta_accuracy": 0.01020986954055586,
+        "ci_lower": -0.012478729438457181,
+        "ci_upper": 0.033479863868406075,
+        "p_value": 0.3825,
+        "n_items": 1763,
+        "n_bootstrap": 2000
+      }
+    },
+    "AraTrust": {
+      "base:cpt": {
+        "delta_accuracy": 0.04639175257731959,
+        "ci_lower": 0.005154639175257714,
+        "ci_upper": 0.08762886597938147,
+        "p_value": 0.03,
+        "n_items": 388,
+        "n_bootstrap": 2000
+      },
+      "base:lep": {
+        "delta_accuracy": -0.03608247422680411,
+        "ci_lower": -0.09278350515463918,
+        "ci_upper": 0.01804123711340211,
+        "p_value": 0.2095,
+        "n_items": 388,
+        "n_bootstrap": 2000
+      },
+      "cpt:lep": {
+        "delta_accuracy": -0.0824742268041237,
+        "ci_lower": -0.14690721649484534,
+        "ci_upper": -0.020618556701030966,
+        "p_value": 0.006,
+        "n_items": 388,
+        "n_bootstrap": 2000
+      }
+    },
+    "ArabicEXAMS": {
+      "base:cpt": {
+        "delta_accuracy": 0.007448789571694647,
+        "ci_lower": -0.018621973929236535,
+        "ci_upper": 0.03351955307262572,
+        "p_value": 0.569,
+        "n_items": 537,
+        "n_bootstrap": 2000
+      },
+      "base:lep": {
+        "delta_accuracy": -0.040968342644320255,
+        "ci_lower": -0.08193668528864062,
+        "ci_upper": 0.0019087523277465392,
+        "p_value": 0.0585,
+        "n_items": 537,
+        "n_bootstrap": 2000
+      },
+      "cpt:lep": {
+        "delta_accuracy": -0.0484171322160149,
+        "ci_lower": -0.08938547486033516,
+        "ci_upper": -0.00931098696461824,
+        "p_value": 0.014,
+        "n_items": 537,
+        "n_bootstrap": 2000
+      }
+    },
+    "ArabicMMLU": {
+      "base:cpt": {
+        "delta_accuracy": 0.01699999999999996,
+        "ci_lower": -0.0020000000000000018,
+        "ci_upper": 0.035999999999999976,
+        "p_value": 0.0825,
+        "n_items": 1000,
+        "n_bootstrap": 2000
+      },
+      "base:lep": {
+        "delta_accuracy": 0.012999999999999956,
+        "ci_lower": -0.02100000000000002,
+        "ci_upper": 0.046024999999999906,
+        "p_value": 0.4645,
+        "n_items": 1000,
+        "n_bootstrap": 2000
+      },
+      "cpt:lep": {
+        "delta_accuracy": -0.0040000000000000036,
+        "ci_lower": -0.03500000000000003,
+        "ci_upper": 0.026000000000000023,
+        "p_value": 0.799,
+        "n_items": 1000,
+        "n_bootstrap": 2000
+      }
+    },
+    "MadinahQA": {
+      "base:cpt": {
+        "delta_accuracy": 0.0020470829068577334,
+        "ci_lower": -0.018423746161719545,
+        "ci_upper": 0.02354145342886388,
+        "p_value": 0.8365,
+        "n_items": 977,
+        "n_bootstrap": 2000
+      },
+      "base:lep": {
+        "delta_accuracy": -0.0051177072671443335,
+        "ci_lower": -0.038894575230296824,
+        "ci_upper": 0.028659160696008212,
+        "p_value": 0.7655,
+        "n_items": 977,
+        "n_bootstrap": 2000
+      },
+      "cpt:lep": {
+        "delta_accuracy": -0.007164790174002067,
+        "ci_lower": -0.038894575230296824,
+        "ci_upper": 0.024564994882292746,
+        "p_value": 0.6595,
+        "n_items": 977,
+        "n_bootstrap": 2000
+      }
+    }
+  },
+  "pooled": {
+    "base:cpt": {
+      "delta_accuracy": 0.005787781350482302,
+      "ci_lower": -0.0036441586280814287,
+      "ci_upper": 0.014790996784565913,
+      "p_value": 0.228,
+      "n_items": 4665,
+      "n_bootstrap": 2000
+    },
+    "base:lep": {
+      "delta_accuracy": -0.005144694533762095,
+      "ci_lower": -0.02165058949624865,
+      "ci_upper": 0.010509110396570194,
+      "p_value": 0.5215,
+      "n_items": 4665,
+      "n_bootstrap": 2000
+    },
+    "cpt:lep": {
+      "delta_accuracy": -0.010932475884244397,
+      "ci_lower": -0.02658628081457666,
+      "ci_upper": 0.004072883172561659,
+      "p_value": 0.158,
+      "n_items": 4665,
+      "n_bootstrap": 2000
+    }
+  },
+  "accuracy": {
+    "base": {
+      "AlGhafa": 0.4083947816222348,
+      "AraTrust": 0.5283505154639175,
+      "ArabicEXAMS": 0.29236499068901306,
+      "ArabicMMLU": 0.345,
+      "MadinahQA": 0.38382804503582396,
+      "macro": 0.3915876665621979,
+      "pooled": 0.3862808145766345
+    },
+    "cpt": {
+      "AlGhafa": 0.4163357912648894,
+      "AraTrust": 0.48195876288659795,
+      "ArabicEXAMS": 0.2849162011173184,
+      "ArabicMMLU": 0.328,
+      "MadinahQA": 0.38178096212896623,
+      "macro": 0.3785983434795544,
+      "pooled": 0.3804930332261522
+    },
+    "lep": {
+      "AlGhafa": 0.40612592172433354,
+      "AraTrust": 0.5644329896907216,
+      "ArabicEXAMS": 0.3333333333333333,
+      "ArabicMMLU": 0.332,
+      "MadinahQA": 0.3889457523029683,
+      "macro": 0.4049675994102714,
+      "pooled": 0.3914255091103966
+    }
+  },
+  "holm_pooled": {
+    "cpt:lep": {
+      "p_raw": 0.158,
+      "p_holm": 0.474,
+      "reject_at_0.05": false
+    },
+    "base:cpt": {
+      "p_raw": 0.228,
+      "p_holm": 0.474,
+      "reject_at_0.05": false
+    },
+    "base:lep": {
+      "p_raw": 0.5215,
+      "p_holm": 0.5215,
+      "reject_at_0.05": false
+    }
+  }
+}
