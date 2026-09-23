@@ -1,0 +1,6 @@
+[
+  {"name": "AraToken-150k-alif-preserve", "kind": "sp", "path": "tokenizers/fw2hq_sp_alif_preserve/sentencepiece.model"},
+  {"name": "AraToken-150k-alif-preserve-bytefallback", "kind": "sp", "path": "tokenizers/fw2hq_sp_alif_preserve_bf/sentencepiece.model"},
+  {"name": "AraBERT", "kind": "hf_hub", "path": "aubmindlab/bert-base-arabertv2"},
+  {"name": "Qwen3", "kind": "hf_hub", "path": "Qwen/Qwen3-0.6B-Base"}
+]

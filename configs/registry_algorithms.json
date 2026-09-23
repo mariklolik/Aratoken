@@ -1,0 +1,74 @@
+[
+  {
+    "name": "bpe_drop",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_bpe_drop/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "bpe_drop_norm",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_bpe_drop_norm/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "bpe_keep",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_bpe_keep/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "bpe_keep_norm",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_bpe_keep_norm/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "wp_drop",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_wp_drop/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "wp_drop_norm",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_wp_drop_norm/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "wp_keep",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_wp_keep/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "wp_keep_norm",
+    "kind": "tok_json",
+    "path": "tokenizers/fw2hq_wp_keep_norm/tokenizer.json",
+    "own_input": "auto"
+  },
+  {
+    "name": "sp_drop",
+    "kind": "sp",
+    "path": "tokenizers/fw2hq_sp_drop/sentencepiece.model",
+    "own_input": "auto"
+  },
+  {
+    "name": "sp_drop_norm",
+    "kind": "sp",
+    "path": "tokenizers/fw2hq_sp_drop_norm/sentencepiece.model",
+    "own_input": "auto"
+  },
+  {
+    "name": "sp_keep",
+    "kind": "sp",
+    "path": "tokenizers/fw2hq_sp_keep/sentencepiece.model",
+    "own_input": "auto"
+  },
+  {
+    "name": "sp_keep_norm",
+    "kind": "sp",
+    "path": "tokenizers/fw2hq_sp_keep_norm/sentencepiece.model",
+    "own_input": "auto"
+  }
+]
