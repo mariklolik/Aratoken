@@ -1,0 +1,1186 @@
+\let\texyear\year
+\documentclass{ieeeaccess}
+\let\ieeeaccessyear\year
+\let\year\texyear
+    \usepackage{orcidlink}
+\let\year\ieeeaccessyear
+\definecolor{accessblue}{RGB}{0,105,154}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{makecell}
+
+\usepackage{caption}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage{url}
+\usepackage{xcolor}
+\newsavebox{\fitbox}
+\newcommand{\fitcolumn}[1]{\sbox{\fitbox}{#1}%
+  \ifdim\wd\fitbox>\linewidth\resizebox{\linewidth}{!}{\usebox{\fitbox}}%
+  \else\usebox{\fitbox}\fi}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\newtheorem{proposition}{Proposition}
+
+\begin{document}
+\history{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}
+\doi{10.1109/ACCESS.2017.DOI}
+
+\title{AraToken: Optimizing Arabic Tokenization with Normalization Pipeline and Language Extension for Qwen3}
+\author{\uppercase{Mark Kashirskiy \authorrefmark{1, 2}, Artiom Lipinski \authorrefmark{3}  and Ilya Makarov\authorrefmark{4,5} (Member, IEEE)}}
+\address[1]{HSE University, 101000 Moscow, Russia}
+\address[2]{AI Talent Hub, ITMO University, 197101 Saint Petersburg, Russia}
+\address[3]{Saint Petersburg State University, 199034 Saint Petersburg, Russia}
+\address[4]{AXXX, 105064 Moscow, Russia}
+\address[5]{Trusted AI Center, RAS, 109004 Moscow, Russia}
+
+\tfootnote{The work was supported by a grant, provided by the Ministry of Economic Development of the Russian Federation (agreement dated June 20, 2025 No. 139-15-2025-011, identifier 000000C313925P4G0002).}
+\markboth
+{Author \headeretal: Preparation of Papers for IEEE TRANSACTIONS and JOURNALS}
+{Author \headeretal: Preparation of Papers for IEEE TRANSACTIONS and JOURNALS}
+
+\corresp{Corresponding author: Mark Kashirskiy (e-mail: 353056@niuitmo.ru).}
+
+\begin{abstract}
+Tokenizers of large language models are trained mostly on English and code,
+and they split an Arabic word into 2.2 tokens on average. Every extra token
+lengthens the sequence, slows training and inference, and leaves less Arabic
+text in the context window. In this paper, we present AraToken, an Arabic
+tokenizer, and the Language Extension Pipeline (LEP), which adds its
+vocabulary to a pretrained Qwen3 model. AraToken combines an orthographic
+normalization pipeline with a SentencePiece Unigram model. LEP extends the
+embedding matrix, initializes the new rows, freezes the original rows and
+trains the top transformer layers. For the initialization we propose a hybrid
+estimate that averages the compositional estimate of mean sub-token
+initialization with the analogical estimate of WECHSEL and FOCUS, and we
+prove when the average is more accurate than either of its parts. On held-out
+Arabic text, AraToken needs 44.4\% fewer tokens per word than the Qwen3
+tokenizer and 30.1\% fewer than AraBERT at a smaller vocabulary. Adapted with
+LEP on 500M tokens, Qwen3-0.6B reaches 1.322 bits per character against 1.405
+for continued pretraining with the original tokenizer, and it covers 1.71
+times as much text per token in training and in generation. The advantage
+holds at 1.7B parameters, 1.260 against 1.267. Under the same training budget, the
+hybrid initializer outperforms mean sub-token initialization and WECHSEL- and
+FOCUS-style initialization computed in the same auxiliary space. We release the tokenizer, the training code and the model
+checkpoints.
+\end{abstract}
+
+\begin{keywords}
+Arabic natural language processing, embedding initialization, large language models, tokenization, vocabulary extension
+\end{keywords}
+
+\titlepgskip=-15pt
+
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+
+The tokenizer decides how many tokens a language model spends on a text.
+Tokenizers of current large language models (LLMs) are trained mostly on
+English and code \cite{brown2020language, touvron2023llama, qwen2024qwen2},
+and they encode other scripts at a much higher cost
+\cite{rust2021good, petrov2023language}. Arabic is a clear case.
+Figure~\ref{fig:segmentation} shows how three tokenizers split the same
+words. The Qwen3 tokenizer cuts \emph{their libraries} into four pieces and
+the borrowing \emph{technology} into four more, while AraToken, the tokenizer
+we present here, keeps the stem of the first word intact and the second word
+whole. Each extra token costs compute in training and in inference, and it
+takes a place in the context window that could hold more text.
+
+Arabic is hard to tokenize for two reasons. First, one word often carries a
+conjunction, a preposition, a stem and a possessive pronoun, all written
+without spaces \cite{habash2010introduction}. Second, the same word can be
+spelled in several ways: Alif has four common variants, diacritics are
+optional, the decorative Tatweel stretches words, and writers mix
+Arabic-Indic and Western digits and punctuation
+\cite{numbencheval, yagi2024arabic}. A tokenizer that ignores these
+properties spends its vocabulary on spelling variants of the same word.
+
+Two lines of work address the problem. The first trains an Arabic tokenizer
+together with a new model, as in AraBERT \cite{antoun2020arabert} and the
+Arabic LLM Jais \cite{sengupta2023jais}. This gives short sequences, but it requires pretraining
+from scratch. The second extends the vocabulary of an existing model with
+Arabic tokens and continues training
+\cite{kuwain_2025, arallama_2024, rightnow_2026}. This reuses the pretrained
+model, and it raises a new question: how to initialize the embeddings of the
+added tokens. Mean sub-token initialization \cite{cui2023efficient} builds a
+new row from the pieces that the old tokenizer produces for the token.
+WECHSEL \cite{minixhofer2022wechsel} and FOCUS \cite{dobler2023focus} build
+it from similar whole tokens of the old vocabulary. The two estimates are
+accurate for different kinds of tokens, and existing methods use one of them.
+
+In this paper, we join the two lines. We train AraToken, an Arabic tokenizer
+with an explicit normalization pipeline, and we add its vocabulary to Qwen3
+\cite{qwen3technicalreport} with the Language Extension Pipeline (LEP), which
+trains the new embedding rows and four of the 28 transformer layers. For the new embedding rows, LEP uses a
+hybrid initializer that averages the compositional and the analogical
+estimates. We evaluate the adapted models in bits per character (BPC), which
+stays comparable when two models tokenize the same text differently.
+
+Our contributions are as follows:
+\begin{itemize}
+\item We present AraToken, a SentencePiece Unigram tokenizer with an Arabic
+normalization pipeline. On held-out text it needs 44.4\% fewer tokens per
+word than the Qwen3 tokenizer and 30.1\% fewer than AraBERT at a smaller
+vocabulary size.
+\item We present LEP, which adds the AraToken vocabulary to Qwen3-0.6B and
+Qwen3-1.7B and trains the new embedding rows and the top four transformer
+layers. With the same data and compute, LEP reaches a lower BPC than continued
+pretraining with the original tokenizer at both sizes, and it covers 1.71
+times as much text per token.
+\item We analyze the initialization of the new rows. We show that mean
+sub-token initialization shrinks a new row by a factor that depends on the
+number of sub-tokens, that this shrinkage keeps the extended model close to
+the original one, and that averaging the compositional and the analogical
+estimates reduces the initialization error whenever the two estimates
+disagree. The resulting hybrid initializer outperforms mean sub-token
+initialization and WECHSEL- and FOCUS-style initialization.
+\item We describe an evaluation protocol for models with different
+vocabularies, and we release the tokenizer, the training code and the model
+checkpoints.
+\end{itemize}
+
+The rest of the paper is organized as follows. Section~\ref{sec:related}
+reviews related work. Section~\ref{sec:methodology} describes AraToken and
+LEP. Section~\ref{sec:experiments} describes the experimental setup, and
+Section~\ref{sec:results} reports the results.
+Section~\ref{sec:discussion} discusses them, and Section~\ref{sec:conclusion}
+concludes the paper. The appendices give details of the evaluation protocol
+and further experiments.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/segmentation_examples.pdf}
+\caption{Segmentation of the same Arabic words by three tokenizers, each
+after its own normalization; pieces are joined with ``+''. AraToken splits
+\emph{their libraries} into stem and possessive clitic, where AraBERT breaks
+the stem and Qwen3 produces four pieces. AraToken keeps the borrowing
+\emph{technology} whole, where AraBERT needs three pieces and Qwen3 four.}
+\label{fig:segmentation}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/overview_pipeline.pdf}
+\caption{Overview of the approach. Arabic text passes through the
+normalization pipeline, a SentencePiece Unigram tokenizer is trained on the
+normalized corpus, and LEP adds its vocabulary to Qwen3.}
+\label{fig:overview}
+\end{figure}
+
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Subword tokenization}
+
+Most LLMs use subword tokenizers, which trade vocabulary size against sequence
+length. Byte Pair Encoding (BPE) \cite{sennrich2016neural} merges the most
+frequent pair of symbols until the vocabulary reaches its target size.
+WordPiece \cite{schuster2012japanese} chooses each merge by likelihood. The
+Unigram model \cite{kudo2018subword} starts from a large vocabulary and
+removes the pieces that contribute least to the likelihood of the corpus.
+SentencePiece \cite{kudo2018sentencepiece} implements BPE and Unigram
+directly on raw text, which suits languages where whitespace does not mark
+morpheme boundaries, and studies of morphologically rich languages report
+better compression for Unigram than for BPE \cite{dominance_unigram_2025}.
+Tokenizers built for English encode other languages at a higher cost
+\cite{rust2021good}, and the same text can need several times as many tokens
+in some languages as in English \cite{petrov2023language}. We measure this
+cost for Arabic on held-out text, with identical preprocessing for every
+tokenizer.
+
+\subsection{Arabic NLP and Arabic language models}
+
+Arabic NLP has long dealt with rich morphology and dialectal variation
+\cite{darwish2021panoramic}. CAMeL Tools \cite{obeid2020camel} provides
+morphological analysis and orthographic normalization for Arabic. AraBERT
+\cite{antoun2020arabert}, AraBART \cite{kamal2021arabart} and AraT5
+\cite{nagoudi2022arat5} were pretrained with their own Arabic tokenizers, and
+recent Arabic LLMs such as Jais \cite{sengupta2023jais}, AceGPT
+\cite{huang2023acegpt} and ALLaM \cite{bari2025allam} reach strong results on
+Arabic benchmarks after large-scale training on Arabic and English text. Two
+recent reports single out the tokenizer as a cost factor. The Tahakom report
+treats tokenizer design as a bottleneck for Arabic models
+\cite{tahakom_2025}, and the Kuwain report shows that an English-centric
+tokenizer raises the cost of Arabic training by up to 68\%
+\cite{kuwain_2025}. These systems rely on large training budgets. AraToken is
+designed to be added to an existing model at a small one.
+
+\subsection{Vocabulary extension and embedding initialization}
+
+Vocabulary extension adds tokens of a new language to a pretrained model and
+continues training. Artetxe et al.\ \cite{artetxe2020cross} show that a frozen
+transformer body transfers to a new language when only the embedding matrix
+is relearned. BLOOM+1 \cite{yong2023bloom} compares continued pretraining with
+adapter methods such as MAD-X \cite{pfeiffer2020mad}, and Zhao et al.\
+\cite{zhao2024llama} adapt LLaMA to Chinese with less than 1\% of its
+pretraining data. For Arabic, Kuwain \cite{kuwain_2025} adds about 26K tokens
+to TinyLlama, AraLLaMA \cite{arallama_2024} expands the vocabulary in stages,
+and RightNow-Arabic \cite{rightnow_2026} adds 27{,}032 tokens to
+Qwen2.5-0.5B and trains on 504M Arabic tokens.
+
+Each added token needs an initial embedding. Mean sub-token initialization
+\cite{cui2023efficient} sets the new row to the average embedding of the
+pieces that the old tokenizer produces for the token, and the Arabic systems
+above use it. WECHSEL \cite{minixhofer2022wechsel} and FOCUS
+\cite{dobler2023focus} set the new row to a weighted sum of the embeddings of
+similar tokens in the old vocabulary. VocADT \cite{han_vocadt_2025} learns the
+new rows with adapters. Hewitt \cite{hewitt2021initializing} shows that the
+norm of a new row controls how far the extension moves the model's next-token
+distribution, and Downey et al.\ \cite{downey2023embedding} show that the
+structure of the initialized matrix affects adaptation. Joshi et al.\
+\cite{joshi2026beyond} compare more than twenty initializers for Hindi.
+Yamaguchi et al.\ \cite{yamaguchi2026expand} find that the initializer
+matters most at small target-language budgets, while studies at 200M and 2.5B
+tokens \cite{tejaswi2024design, mundra2024empirical} find mean sub-token
+initialization sufficient. Each of these methods uses one estimate of the new
+row. Our hybrid initializer averages two estimates whose errors differ, and
+we state the condition under which the average is the more accurate one.
+
+\section{Methodology}
+\label{sec:methodology}
+
+AraToken reduces the number of tokens that Arabic text costs, and LEP brings
+its vocabulary into a pretrained model without pretraining from scratch.
+Figure~\ref{fig:overview} shows the whole pipeline. This section describes
+the normalization pipeline, the tokenizer and the three steps of LEP.
+
+\subsection{Arabic normalization pipeline}
+\label{sec:normalization}
+
+Web Arabic writes the same word in several ways, and a tokenizer trained on
+raw text learns a separate piece for each spelling. The normalization
+pipeline removes this variation before the tokenizer sees the text. We
+implement it as a normalizer of the HuggingFace Tokenizers library
+\cite{moi2023tokenizers}, so the same rules apply during training and at
+inference time. The pipeline applies NFKC normalization, removes Tatweel
+(U+0640), maps Arabic-Indic digits (U+0660--U+0669) to Western digits, and
+maps the Arabic comma, semicolon and question mark (U+060C, U+061B, U+061F)
+to their Latin forms. It removes diacritics by default, and a second mode
+keeps them for tasks that need vocalized text. Table~\ref{tab:normalization}
+lists the rules, and Figure~\ref{fig:normalization} shows their effect on
+sample text.
+
+The pipeline can also unify the four Alif variants (U+0622, U+0623, U+0625,
+U+0671) into bare Alif (U+0627), as many Arabic toolkits do
+\cite{obeid2020camel, habash2010introduction}. We keep the variants by
+default, because the position of the hamza can mark grammatical case and word
+origin \cite{darwish2021panoramic}. The two settings differ by less than
+0.5\% in BPC (Appendix~\ref{app:alif}).
+
+\begin{table}[t]
+\centering
+\includegraphics[width=0.75\columnwidth]{figures/normalization_table.pdf}
+\caption{Character rules of the normalization pipeline. Alif unification is
+available as an option and is off by default.}
+\label{tab:normalization}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/normalization_examples.pdf}
+\caption{Sample text before and after the normalization pipeline. The second
+row shows the optional Alif unification.}
+\label{fig:normalization}
+\end{figure}
+
+\subsection{Tokenizer training}
+\label{sec:tokenizer_training}
+
+We train AraToken with the SentencePiece Unigram algorithm
+\cite{kudo2018sentencepiece, kudo2018subword} on the \texttt{tok-train}
+split of our corpus (Section~\ref{sec:data}): 159{,}826 documents with about
+480M characters from the Arabic part of FineWeb2-HQ \cite{fineweb2hq_2025}.
+We chose Unigram after comparing it with BPE and WordPiece under every
+preprocessing configuration (Section~\ref{sec:res_algorithms}). The target
+vocabulary has 150{,}000 pieces, close to the 151{,}643 regular tokens of
+Qwen3. We train with byte fallback, so a character outside the vocabulary
+becomes its UTF-8 bytes instead of an unknown token, and every input can be
+encoded.
+
+A 150K vocabulary adds many embedding rows. For tighter memory budgets we
+prune the vocabulary by corpus coverage: we keep the most frequent pieces
+that together cover 99\% or 95\% of the tokens of the training corpus. This
+gives vocabularies of 109{,}844 and 60{,}149 pieces
+(Section~\ref{sec:res_pruning}).
+
+\subsection{Language Extension Pipeline}
+\label{sec:lep}
+
+LEP adds the AraToken vocabulary to Qwen3 in three steps. It extends the
+vocabulary, initializes the new embedding rows, and trains the new rows
+together with the top transformer layers (Figure~\ref{fig:lep_architecture}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/lep_architecture.pdf}
+\caption{The Language Extension Pipeline. New Arabic tokens are appended to
+the Qwen3 vocabulary and their embedding rows are initialized. During
+training, gradient masking keeps the original rows fixed, and only the new
+rows and the last four transformer layers are updated.}
+\label{fig:lep_architecture}
+\end{figure}
+
+\subsubsection{Vocabulary extension}
+
+Let $\mathcal{T}_{\mathrm{ar}}$ be AraToken and $\mathcal{T}_{\mathrm{qwen}}$
+the Qwen3 tokenizer. We take every piece of $\mathcal{T}_{\mathrm{ar}}$ that
+is not in $\mathcal{T}_{\mathrm{qwen}}$ and drop the pieces that contain Latin
+or Cyrillic letters, bare digits or punctuation, which Qwen3 already encodes
+well. For Qwen3-0.6B this leaves 130{,}890 new tokens. We extend the embedding
+matrix $M \in \mathbb{R}^{n \times d}$ of Qwen3, where $n$ is the size of the
+Qwen3 vocabulary and $d = 1024$, by 130{,}890 rows. Qwen3-0.6B ties its input
+and output embeddings, so the new rows add 134M parameters once, and the model
+grows from 596M to 730M parameters.
+
+\subsubsection{Initialization of the new rows}
+\label{sec:init}
+
+Each new token $t_k$ needs an initial row $M_{n+k}$. LEP computes two
+estimates of this row and takes their average.
+
+The \emph{compositional} estimate encodes the surface form of $t_k$ with
+$\mathcal{T}_{\mathrm{qwen}}$, which gives a set $S_k$ of sub-tokens, and
+averages their embeddings \cite{cui2023efficient}:
+\begin{equation}
+c_k = \frac{1}{|S_k|} \sum_{s \in S_k} M_s .
+\label{eq:comp}
+\end{equation}
+Proposition~\ref{prop:shrink} describes where this estimate lies.
+
+\begin{proposition}
+\label{prop:shrink}
+Let the sub-token embeddings $M_s$, $s \in S_k$, have mean $\mu$,
+$\mathbb{E}\lVert M_s - \mu \rVert^2 = r^2$, and
+$\mathbb{E}\langle M_s - \mu, M_t - \mu \rangle = \rho r^2$ for $s \neq t$.
+Then
+\begin{equation}
+\mathbb{E}\lVert c_k - \mu \rVert^2 = \frac{1 + (|S_k| - 1)\rho}{|S_k|}\, r^2 .
+\end{equation}
+\end{proposition}
+
+\emph{Proof.} Write $c_k - \mu$ as the mean of the $|S_k|$ centered vectors
+and expand the squared norm. The $|S_k|$ diagonal terms contribute
+$|S_k| r^2$ and the $|S_k|(|S_k| - 1)$ cross terms contribute $\rho r^2$ each.
+Dividing by $|S_k|^2$ gives the result. \hfill$\square$
+
+For uncorrelated sub-tokens, the radius of $c_k$ therefore shrinks as
+$|S_k|^{-1/2}$. Figure~\ref{fig:init_shrinkage} shows this on the 130{,}890
+added rows. The mean radius of $c_k$ is 0.60 of the donor radius, and it
+falls from 0.89 for single-piece tokens to 0.49 for six-piece tokens. From
+three sub-tokens on, the measured curve lies slightly above $|S_k|^{-1/2}$,
+because the pieces of one word are positively correlated ($\rho > 0$).
+
+This shrinkage keeps the extended model close to the original one. With tied
+embeddings, a new row also sets the output logit $h^\top M_{n+k}$ of its
+token. Before training, the new tokens change the next-token distribution by
+\cite{hewitt2021initializing}
+\begin{equation}
+\mathrm{KL}\left(p_{\mathrm{old}} \,\Vert\, p_{\mathrm{new}}\right)
+= \log\!\left(1 + \frac{1}{Z} \sum_{k} \exp\!\left(h^\top M_{n+k}\right)\right),
+\label{eq:kl}
+\end{equation}
+where $h$ is the hidden state and $Z$ is the partition function over the
+original vocabulary. Rows of small norm keep the new logits near zero, so the
+added probability mass stays small next to $Z$ and the extended model starts
+near the original model. For this reason LEP does not rescale the
+compositional estimate. It improves its direction instead.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/init_shrinkage.pdf}
+\caption{Radius of the compositional estimate $c_k$ relative to the donor
+embedding radius, by the number of Qwen3 sub-tokens of the new token. The
+dashed line is the $|S_k|^{-1/2}$ law of Proposition~\ref{prop:shrink} for
+uncorrelated sub-tokens.}
+\label{fig:init_shrinkage}
+\end{figure}
+
+The \emph{analogical} estimate reads $t_k$ by its similarity to whole tokens
+of the old vocabulary, in the manner of WECHSEL \cite{minixhofer2022wechsel}
+and FOCUS \cite{dobler2023focus}. Let $\mathcal{N}_k$ be the tokens of
+$\mathcal{T}_{\mathrm{qwen}}$ whose surface forms share the most character
+$n$-grams with $t_k$, and let $w_s$ be their normalized overlap. Then
+\begin{equation}
+a_k = \sum_{s \in \mathcal{N}_k} w_s M_s .
+\label{eq:anal}
+\end{equation}
+
+The two estimates fail on different tokens. The compositional estimate is
+accurate when the pieces of $t_k$ carry its meaning, and poor when they are
+arbitrary byte fragments. The analogical estimate is accurate when the old
+vocabulary holds a similar whole word, and poor when it does not. LEP
+therefore uses their average,
+\begin{equation}
+M_{n+k} = \tfrac{1}{2}\left(c_k + a_k\right),
+\label{eq:hybrid}
+\end{equation}
+and Proposition~\ref{prop:hybrid} states when this average is more accurate
+than either estimate.
+
+\begin{proposition}
+\label{prop:hybrid}
+Let $v_k$ be the ideal row of $t_k$, and let $\varepsilon_c = c_k - v_k$ and
+$\varepsilon_a = a_k - v_k$ be the errors of the two estimates. The error of
+the hybrid~(\ref{eq:hybrid}) is
+\begin{equation}
+\lVert M_{n+k} - v_k \rVert^2
+= \tfrac{1}{2}\left(\lVert\varepsilon_c\rVert^2 + \lVert\varepsilon_a\rVert^2\right)
+- \tfrac{1}{4}\lVert c_k - a_k \rVert^2 .
+\end{equation}
+The hybrid error is therefore never larger than the mean of the two errors,
+and it is smaller than the smaller of them whenever
+$\lVert c_k - a_k \rVert^2 > 2\,\bigl|\lVert\varepsilon_c\rVert^2 - \lVert\varepsilon_a\rVert^2\bigr|$.
+\end{proposition}
+
+\emph{Proof.} Apply the parallelogram identity
+$\lVert x + y\rVert^2 + \lVert x - y\rVert^2 = 2\lVert x\rVert^2 + 2\lVert y\rVert^2$
+to $x = \varepsilon_c$ and $y = \varepsilon_a$, divide by four, and note that
+$\varepsilon_c - \varepsilon_a = c_k - a_k$. \hfill$\square$
+
+The gain grows with the disagreement $\lVert c_k - a_k \rVert$, which is large
+when the two estimates err in different directions, as they do on tokens where
+one of them fails and the other does not. We
+fix the weight at one half before any training run, so the comparison in
+Section~\ref{sec:res_init} does not favor a tuned configuration. The hybrid
+needs no data beyond that of the analogical estimate, and it costs one pass
+over the added vocabulary.
+
+\subsubsection{Gradient masking and selective unfreezing}
+
+During adaptation, LEP keeps the original embedding rows fixed. A backward
+hook sets their gradients to zero:
+\begin{equation}
+\nabla_{M_i} \mathcal{L} =
+\begin{cases}
+0 & \text{if } i < n, \\
+\nabla_{M_i} \mathcal{L} & \text{otherwise.}
+\end{cases}
+\label{eq:mask}
+\end{equation}
+Because the embeddings are tied, the hook also fixes the output rows of the
+original vocabulary. The network must also adapt to the new segmentation of
+Arabic text, which the new rows alone cannot do (Appendix~\ref{app:layers}).
+LEP therefore trains the top transformer layers as well, which for the
+28-layer Qwen3-0.6B are layers 24 to 27. The rest of the network stays
+frozen, and the trainable set is the 130{,}890 new rows and four transformer
+layers, 197M parameters in total. Section~\ref{sec:res_lep} shows that
+unfreezing more layers lowers Arabic BPC further.
+
+\section{Experimental Setup}
+\label{sec:experiments}
+
+\subsection{Data}
+\label{sec:data}
+
+All experiments use the Arabic part (\texttt{arb\_Arab}) of FineWeb2-HQ
+\cite{fineweb2hq_2025}, a quality-filtered subset of FineWeb2 with 5.56M
+documents. We assign every document to one of four splits by hashing its
+corpus identifier: \texttt{tok-train} for tokenizer training,
+\texttt{lm-train} for adaptation, \texttt{dev} for monitoring the training
+loss, and \texttt{test} for every reported measurement. The assignment is
+deterministic and the splits are disjoint by construction. A MinHash check
+\cite{broder1997resemblance} finds a near duplicate in the training splits for
+0.65\% of the test documents (Appendix~\ref{app:protocol}). The adaptation
+budget is 500M training tokens on \texttt{lm-train}, the budget of the closest
+comparable system \cite{rightnow_2026}.
+
+\subsection{Models and baselines}
+
+The base model is Qwen3-0.6B-Base \cite{qwen3technicalreport}, a 28-layer
+transformer with hidden size 1{,}024 and tied input and output embeddings. We
+chose the Qwen family because it gives the strongest Arabic results among
+open models of its size on the Open Arabic LLM Leaderboard \cite{OALL-2}.
+To test scale, we repeat the main comparison with Qwen3-1.7B-Base, which has
+the same 28 layers, hidden size 2{,}048 and the same vocabulary, so it
+receives the same 130{,}890 new rows.
+Qwen3 uses the same byte-level BPE tokenizer as Qwen2.5.
+
+We compare AraToken with the tokenizers of Qwen2.5/Qwen3 and DeepSeek-V3,
+which are general-purpose, and with the tokenizer of AraBERT
+\cite{antoun2020arabert}, which is Arabic-specific and has 64K pieces. We
+compare LEP with continued pretraining (CPT) of Qwen3 on the same data with its
+original tokenizer. CPT is run at equal compute, with the same number of
+training tokens as LEP, and at equal text, with 3{,}584 steps so that it reads
+the same Arabic text as LEP. We compare the hybrid initializer with random
+initialization, mean sub-token initialization \cite{cui2023efficient}, a
+moment-matched variant of it, and WECHSEL-style \cite{minixhofer2022wechsel}
+and FOCUS-style \cite{dobler2023focus} analogical estimates. The analogical
+estimates share one auxiliary space, character $n$-gram overlap, so that the
+comparison isolates the choice of estimate; the FOCUS-style estimate draws
+only on tokens that both vocabularies contain. Table~\ref{tab:design} lists
+all configurations.
+
+\begin{table}[t]
+\centering
+\small
+\fitcolumn{\begin{tabular}{p{1.9cm}p{4.6cm}c}
+\toprule
+\textbf{Comparison} & \textbf{Configurations} & \textbf{Seeds} \\
+\midrule
+Tokenizer & AraToken at 150K, 99\% and 95\% coverage; Qwen2.5/Qwen3; DeepSeek-V3; AraBERT & -- \\
+Adaptation & LEP; CPT at equal compute; CPT at equal text & 3 \\
+Initialization & hybrid; mean sub-token; WECHSEL-style; FOCUS-style; moment-matched; random & 3 \\
+Trainable set & layer 27; 24--27; 18--27; 9--27; all layers & 3 \\
+\bottomrule
+\end{tabular}}
+\caption{Experimental design. Every adaptation run uses the same data and
+training recipe, so each comparison varies one factor.}
+\label{tab:design}
+\end{table}
+
+\subsection{Training}
+
+We train with AdamW, weight decay 0.01 and a linear learning-rate schedule
+with a peak of $2\times10^{-4}$ and 10\% warmup. Each step processes 96
+sequences of 1{,}024 tokens. The comparison runs last 2{,}000 steps (196M
+tokens) on one H100 GPU, and the main configuration lasts 5{,}086 steps on
+four H100 GPUs, which is the 500M-token budget. We repeat every 2{,}000-step
+configuration with three seeds, and we run the 500M-token configurations once. Appendix~\ref{app:hparams} lists all hyperparameters.
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+For tokenizers we report \emph{fertility}, the number of tokens per
+whitespace-delimited word, and \emph{compression}, the number of characters
+per token. Both are means over test documents, and every tokenizer receives
+identically normalized input. We also report tokens per morpheme, with
+morphemes from the CAMeL Tools analyzer \cite{obeid2020camel}.
+
+For language models we report bits per character (BPC),
+\begin{equation}
+\mathrm{BPC} = \frac{\sum_i \mathrm{NLL}(t_i)}{|c| \ln 2},
+\label{eq:bpc}
+\end{equation}
+where the sum runs over the scored tokens and $|c|$ is the number of
+characters they cover. Per-token cross-entropy cannot compare LEP with the base
+model, because a coarser segmentation lowers the per-token loss without any
+gain in modeling. BPC charges every model for the same characters.
+
+For Arabic task accuracy we use the native-Arabic suite of the Open Arabic LLM
+Leaderboard v2 \cite{OALL-2}: ArabicMMLU \cite{koto2024arabicmmlu}, AlGhafa
+\cite{almazrouei2023alghafa}, Arabic EXAMS \cite{hardalov2020exams},
+MadinahQA and AraTrust \cite{alghamdi2024aratrust}. The options of each
+question are listed with letters, the model scores the letter, and the option
+order advances by one position from item to item. Letters cost one token
+under every vocabulary, and the rotation cancels the preference of a model for
+a fixed position \cite{zheng2024robust}, so models with different vocabularies
+are scored on equal terms (Appendix~\ref{app:tasks}). For efficiency we report
+training time, GPU-hours and the amount of text per generated token.
+
+\subsection{Statistical analysis}
+
+We report means over three seeds, with standard deviations in the tables. We
+compare configurations with a paired bootstrap \cite{efron1979bootstrap} over
+test documents and control the family-wise error rate with the
+Holm--Bonferroni procedure \cite{holm1979simple}. Every BPC difference between
+our method and a baseline in Section~\ref{sec:results} is significant at
+$p < 0.0001$ after correction, and every fertility difference
+between AraToken and a baseline tokenizer has disjoint 95\% bootstrap
+intervals.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{AraToken against existing tokenizers}
+\label{sec:res_tokenizers}
+
+Table~\ref{tab:baseline_comparison} and Figure~\ref{fig:baseline_comparison}
+compare AraToken with the tokenizers of Qwen2.5/Qwen3, DeepSeek-V3 and
+AraBERT. AraToken gives the lowest fertility and the highest compression of
+all systems. On normalized text it needs 1.212 tokens per word, against 2.179
+for Qwen2.5/Qwen3, 2.177 for DeepSeek-V3 and 1.833 for AraBERT. This is
+44.4\% fewer tokens than the tokenizer of Qwen3 and 33.9\% fewer than AraBERT,
+and each token covers 4.80 characters, against 2.67 and 3.17. AraToken also
+leads on raw, unnormalized text, where it needs 40.2\% fewer tokens than the
+tokenizer of Qwen3, so most of the gain comes from the segmentation model
+itself.
+
+\input{tables/baseline_comparison}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/baseline_comparison.pdf}
+\caption{Fertility (left, lower is better) and compression (right, higher is
+better) of AraToken and existing tokenizers on the \texttt{test} split, with
+95\% bootstrap intervals.}
+\label{fig:baseline_comparison}
+\end{figure*}
+
+Part of the gap to AraBERT could come from vocabulary size, since AraToken has
+150K pieces and AraBERT 64K. The pruned AraToken with 95\% coverage has
+60{,}149 pieces, fewer than AraBERT, and it still needs 30.1\% fewer tokens
+per word. Vocabulary size therefore accounts for 3.8 points of the
+33.9-point gap, and segmentation for the rest. AraToken also needs the fewest
+tokens per morpheme: 0.89, against 1.32 for AraBERT and 1.57 for Qwen3, with
+morphemes from the CAMeL Tools analyzer. A value below one means that its
+tokens often span more than one morpheme. On dialectal tweets from ArSarcasm,
+a register far from its training corpus, AraToken with byte fallback still
+needs 21.8\% fewer tokens per word than the tokenizer of Qwen3
+(Appendix~\ref{app:dialect}).
+
+\subsection{Choice of segmentation algorithm}
+\label{sec:res_algorithms}
+
+Table~\ref{tab:tokenizer_results} compares BPE, WordPiece and Unigram, trained
+on the same corpus at an 80K vocabulary, with and without the steps of the
+normalization pipeline. Unigram gives the lowest fertility and the highest
+compression in every configuration. With the full pipeline it needs 1.245
+tokens per word, against 1.295 for BPE and 1.296 for WordPiece, and it covers
+4.69 characters per token, against 4.51 for both. Its rate of unknown words is
+0.28\%, and byte fallback removes them at a cost of 0.3\% in fertility
+(Appendix~\ref{app:dialect}).
+
+\input{tables/tokenizer_results}
+
+Both steps of the pipeline lower fertility for all three algorithms
+(Figure~\ref{fig:fertility}). Removing diacritics gives the larger gain: 7.0\%
+for BPE, 7.1\% for WordPiece and 2.6\% for Unigram. The character rules add
+about 0.6\% for each algorithm, and the full pipeline lowers fertility by
+7.5\%, 7.6\% and 3.2\%. We attribute the smaller gain of Unigram to its
+training procedure, which drops rare diacritized variants from the vocabulary
+during EM, so Unigram spends less of its vocabulary on them in the first place.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fertility_comparison.pdf}
+\caption{Fertility of the three segmentation algorithms on the \texttt{test}
+split under four preprocessing configurations, with 95\% bootstrap
+intervals.}
+\label{fig:fertility}
+\end{figure}
+
+\subsection{Vocabulary pruning}
+\label{sec:res_pruning}
+
+Table~\ref{tab:pruning_results} and Figure~\ref{fig:pruning} show the cost of
+pruning. At 99\% coverage the vocabulary shrinks by 27\%, to 109{,}844
+pieces, and fertility rises by 1.2\%, from 1.212 to 1.227. At 95\% coverage it
+shrinks by 60\%, to 60{,}149 pieces, for a rise of 5.7\% to 1.281. Both pruned
+tokenizers stay well ahead of every baseline in
+Table~\ref{tab:baseline_comparison}. Pruning removes the long and rare pieces
+of the vocabulary, most of them names and borrowings
+(Appendix~\ref{app:pruning}), so one coverage threshold sets the trade-off
+between vocabulary size and fertility.
+
+\input{tables/pruning_results}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/vocab_pruning.pdf}
+\caption{Vocabulary size and fertility of AraToken at full size and at 99\%
+and 95\% coverage.}
+\label{fig:pruning}
+\end{figure}
+
+\subsection{Adaptation quality}
+\label{sec:res_lep}
+
+Table~\ref{tab:bpc} compares LEP with continued pretraining (CPT) of Qwen3 on
+the same data with its original tokenizer. LEP reaches the lower BPC in every
+comparison. At 2{,}000 steps and equal compute, LEP reaches 1.3808 against
+1.4374 for CPT, a gap of 0.057 BPC. The two runs read different amounts of
+text, because AraToken encodes the same text in fewer tokens: in 2{,}000 steps
+LEP reads 43.9\% of the adaptation corpus and CPT reads 24.5\%. When CPT runs
+for 3{,}584 steps so that both models read the same text, LEP is still 0.036
+BPC lower. The new vocabulary therefore helps in two ways: each step covers
+more text, and the model fits the text better. At the full budget of 500M
+tokens the gap grows to 0.083 BPC, 1.3219 against 1.4047.
+
+The advantage carries over to Qwen3-1.7B. With the same data, trainable
+layers and number of steps, LEP with the hybrid initializer of
+Section~\ref{sec:res_init} reaches 1.2598 against 1.2672 for CPT, and the
+paired test over documents gives $p < 0.001$. Both models improve on the
+unadapted Qwen3-1.7B at 1.3313, and LEP improves on it by 0.071 BPC against
+0.064 for CPT.
+
+\begin{table}[t]
+\centering
+\small
+\fitcolumn{\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Configuration} & \textbf{BPC} $\downarrow$ & \textbf{$\Delta$ base} \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Qwen3-0.6B, 2{,}000 steps, three seeds}} \\
+Qwen3-0.6B-Base, no adaptation & 1.5446 & -- \\
+CPT, equal compute & 1.4374 & $-0.1071$ \\
+CPT, equal text (3{,}584 steps) & 1.4170 & $-0.1276$ \\
+\textbf{LEP, layers 24--27} & \textbf{1.3808} & $\mathbf{-0.1637}$ \\
+\textbf{LEP, all layers} & \textbf{1.2474} & $\mathbf{-0.2972}$ \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Qwen3-0.6B, 500M tokens, one run}} \\
+CPT & 1.4047 & $-0.1398$ \\
+\textbf{LEP, layers 24--27} & \textbf{1.3219} & $\mathbf{-0.2226}$ \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Qwen3-1.7B, 2{,}000 steps, one run}} \\
+Qwen3-1.7B-Base, no adaptation & 1.3313 & -- \\
+CPT & 1.2672 & $-0.0640$ \\
+\textbf{LEP, hybrid init.} & \textbf{1.2598} & $\mathbf{-0.0714}$ \\
+\bottomrule
+\end{tabular}}
+\caption{Arabic BPC on the \texttt{test} split. CPT is continued pretraining
+of Qwen3 with its original tokenizer on the same data, and $\Delta$~base is the
+difference to the unadapted model of the same size. Standard deviations over three seeds are
+at most 0.0008.}
+\label{tab:bpc}
+\end{table}
+
+Figure~\ref{fig:ablation} varies the trainable set of LEP. Every configuration
+beats CPT, including LEP with only layer 27 trainable, which updates fewer
+transformer layers than CPT does. BPC falls steadily as more layers are
+trained and reaches 1.2474 with all layers trainable, so LEP offers a range of
+operating points, from a light adaptation with one trainable layer to full
+training of the transformer.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/ablation_study.pdf}
+\caption{Arabic BPC of LEP by trainable set at 2{,}000 steps, three seeds.
+Each bar starts at the BPC of CPT with the original tokenizer (dashed line),
+and its label gives the gain of LEP.}
+\label{fig:ablation}
+\end{figure}
+
+\subsection{Initialization of the new rows}
+\label{sec:res_init}
+
+Table~\ref{tab:init} and Figure~\ref{fig:init_bpc} compare the hybrid
+initializer with the other initializers. All runs share the data, the
+trainable set and the number of steps, and they differ only in the initial
+state of the 130{,}890 new rows. The hybrid initializer gives the lowest BPC,
+1.3470, and the lowest loss at the first step, 9.14. It is 0.0112 BPC below
+the WECHSEL-style estimate, 0.0113 below the FOCUS-style estimate and 0.0338
+below mean sub-token initialization. The WECHSEL-style and FOCUS-style
+estimates reach almost the same value, 1.3583 and 1.3584, and both are ahead
+of the mean sub-token estimate, which is in turn far ahead of random
+initialization at 2.2151.
+
+\input{tables/init_methods}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/init_bpc.pdf}
+\caption{Arabic BPC after 2{,}000 steps for the hybrid initializer and its
+three closest competitors, mean $\pm$ s.d.\ over three seeds.}
+\label{fig:init_bpc}
+\end{figure}
+
+These results match the analysis of Section~\ref{sec:init}. The hybrid leads
+at the first step, where only the initialization differs, and its lead lasts
+to the end of training. Proposition~\ref{prop:hybrid} accounts for the first
+observation, since the compositional and analogical estimates err on
+different tokens. The moment-matched variant confirms the role of the norm.
+It keeps the direction of the mean sub-token estimate and rescales each row to
+the donor radius, and its first-step loss rises from 9.48 to 17.77, as
+Equation~(\ref{eq:kl}) predicts: larger rows give larger logits to the new
+tokens and move the extended model away from the original one. Joshi et al.\
+\cite{joshi2026beyond} observe the same effect on another model and language,
+where rescaling both embedding matrices raises the initial loss from 7.499 to
+17.618. With tied embeddings the input and output rows cannot be rescaled
+separately, so LEP keeps the small norm of the compositional estimate and
+improves its direction with the analogical estimate.
+
+\subsection{Text per token}
+\label{sec:res_eff}
+
+Table~\ref{tab:efficiency} shows how much text a token carries. The extended
+tokenizer of LEP covers 4.43 characters per token on the \texttt{test} split,
+against 2.59 for the tokenizer of Qwen3, so every token that LEP reads in
+training or generates in inference carries 1.71 times as much text. The
+adaptation corpus shows the same effect: it takes 448M tokens with the
+extended tokenizer and 803M with the original one. At a fixed compute budget
+LEP therefore reads 1.8 times as much Arabic text as CPT, and at a fixed
+generation speed in tokens per second it produces 1.71 times as much text.
+
+\begin{table}[t]
+\centering
+\small
+\fitcolumn{\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Quantity} & \textbf{CPT} & \textbf{LEP} \\
+\midrule
+Characters per token & 2.59 & \textbf{4.43} \\
+Tokens in the adaptation corpus & 803M & \textbf{448M} \\
+Corpus read in 2{,}000 steps & 24.5\% & \textbf{43.9\%} \\
+Text per token, relative & 1.00$\times$ & \textbf{1.71$\times$} \\
+\bottomrule
+\end{tabular}}
+\caption{Text per token for Qwen3 with its original tokenizer (CPT) and with
+the extended tokenizer of LEP.}
+\label{tab:efficiency}
+\end{table}
+
+\subsection{Arabic task accuracy}
+\label{sec:res_tasks}
+
+Table~\ref{tab:oall} reports accuracy on the native-Arabic suite of the Open
+Arabic LLM Leaderboard v2. LEP reaches the highest macro-average accuracy of
+the three models, 0.405, against 0.392 for the unadapted model and 0.379 for
+CPT, with its largest margins on AraTrust and Arabic EXAMS. The efficiency
+gains of LEP therefore come without a loss in Arabic task accuracy.
+Appendix~\ref{app:tasks} gives the item-level comparison and the results on
+Arabic classification and inference tasks.
+
+\input{tables/oall}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Why Unigram and normalization suit Arabic}
+
+Unigram segments a word by the likelihood of the whole segmentation, and it
+builds its vocabulary by removing the pieces that the corpus supports least.
+Arabic words are dense combinations of clitics, stems and affixes that admit
+several segmentations, and a probabilistic choice among them suits this
+structure better than the greedy merges of BPE. Normalization acts on the
+vocabulary before segmentation does. Every spelling variant that the pipeline
+removes is one piece the tokenizer does not need to learn, and the freed
+vocabulary goes to distinct words. The two components therefore reinforce
+each other, and Unigram leads in every configuration of
+Table~\ref{tab:tokenizer_results}.
+
+\subsection{Two gains from one vocabulary}
+
+The adaptation results separate two effects of the new vocabulary. At equal
+text, LEP reaches a lower BPC than CPT, so the extended model fits Arabic
+better. At equal compute, each step of LEP covers 1.8 times as much text, so
+the model sees more Arabic for the same cost. The first gain comes from the
+segmentation and the second from the compression, and both grow with the
+budget: the gap to CPT widens from 0.057 BPC at 2{,}000 steps to 0.083 at
+500M tokens. A practitioner who adapts a model to Arabic under a fixed compute
+budget receives both.
+
+\subsection{Norm and direction of a new embedding}
+
+Propositions~\ref{prop:shrink} and~\ref{prop:hybrid} give a simple rule for
+initializing added rows in a model with tied embeddings. The norm of a new row
+should stay small, because the row also sets the logit of the new token, and
+the compositional estimate provides this small norm by construction. The
+direction of the row should come from several estimates that fail on
+different tokens, because their average cancels part of their errors. The
+hybrid initializer follows this rule, and it outperforms each of its parents.
+Neither proposition depends on Arabic, so the rule can be tested on
+vocabulary extension for any language.
+
+\subsection{Evaluation across vocabularies}
+
+A model with an extended vocabulary cannot be compared with its base model by
+per-token loss, because the two models count different tokens for the same
+text. BPC solves this for language modeling. Task accuracy needs a similar
+correction, because a label word can cost one token in the extended vocabulary
+and several in the original one. Scoring a letter for each option, with the
+option order rotated from item to item, gives both models the same candidates
+and cancels their preference for a fixed position. The same protocol can
+be used for any comparison between models with different tokenizers.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this paper, we presented AraToken, an Arabic tokenizer that combines an
+orthographic normalization pipeline with a SentencePiece Unigram model, and
+LEP, a pipeline that adds its vocabulary to a pretrained Qwen3 model. AraToken
+encodes Arabic in fewer tokens than general-purpose and Arabic-specific
+tokenizers, also when its vocabulary is smaller than theirs. Adapted with LEP,
+Qwen3 reaches a lower BPC than continued pretraining with its original
+tokenizer at equal compute and at equal text, and every token it reads or
+generates carries more Arabic text. We showed that the norm of a new embedding
+row should stay small and that its direction should combine estimates with
+different failure modes, and the resulting hybrid initializer outperforms the
+initializers it combines.
+
+In the future, we plan to fit AraToken on dialectal Arabic and to extend LEP
+to Qwen3 models beyond 1.7B parameters. We also plan to study the hybrid initializer for other
+languages whose scripts the donor vocabulary covers poorly.
+
+\subsection*{Limitations}
+
+AraToken is fitted on Modern Standard Arabic, so many dialectal forms fall
+outside its vocabulary, and its advantage over Qwen3 shrinks to 21.8\% on
+dialectal tweets; a dialect-stratified corpus addresses this. LEP trains
+layers that both languages share, and adapting them to the new embeddings
+raises English BPC to 1.138, against 1.068 for CPT; replaying English data or
+regularizing toward the original weights can limit this drift. We validate
+task accuracy at 0.6B parameters, where Arabic task suites separate models
+poorly.
+
+\appendices
+
+\section{Evaluation protocol}
+\label{app:protocol}
+
+\subsection*{Split construction}
+Each document of FineWeb2-HQ is assigned to a split by hashing its corpus
+identifier,
+\begin{equation}
+\mathrm{split}(d) = \mathcal{B}\!\left(\mathrm{blake2b}(\mathrm{id}_d) \bmod 1000\right),
+\end{equation}
+where $\mathcal{B}$ maps disjoint ranges of buckets to \texttt{tok-train},
+\texttt{lm-train}, \texttt{dev} and \texttt{test}. The assignment does not
+depend on read order or on how much of the corpus is consumed, and a
+cryptographic digest keeps it stable across processes and machines. The
+\texttt{test} split is used only for measurement.
+
+\subsection*{Near duplicates}
+Web corpora repeat passages under different identifiers, so disjoint
+identifiers do not guarantee disjoint text. We measure the residual overlap
+with MinHash \cite{broder1997resemblance} in the configuration of RefinedWeb
+\cite{penedo2023refinedweb} and FineWeb \cite{penedo2024fineweb}: 5-gram word
+shingles and 112 permutations in 14 bands of 8, which places the detection
+threshold at a Jaccard similarity of 0.72. Of the 6{,}602 \texttt{test}
+documents, 43 (0.65\%) have a near duplicate among the 822{,}511 indexed
+training documents, and none has an exact duplicate.
+
+\subsection*{Measurement conventions}
+Fertility and compression are per-document means with 95\% bootstrap
+intervals over 10{,}000 resamples. We also compute corpus-level aggregates,
+but a table never mixes the two conventions. In the algorithm comparison,
+each tokenizer is measured under the preprocessing recorded in its saved
+specification: BPE and WordPiece apply their normalizer inside the tokenizer,
+and SentencePiece receives normalized text.
+
+\section{Alif handling}
+\label{app:alif}
+
+Table~\ref{tab:ablation} crosses Alif handling with the learning rate in a
+full factorial design, three seeds per cell. At a learning rate of
+$8\times10^{-5}$ the two settings do not differ ($+0.0004$ BPC, $p = 0.53$).
+At $2\times10^{-4}$ unification is 0.0061 BPC lower ($p < 0.0001$), which is
+less than 0.5\% of the BPC and about a twentieth of the effect of the
+trainable set (Table~\ref{tab:layers}). The learning rate matters far more:
+$2\times10^{-4}$ lowers BPC by about 0.2 in both settings. We keep the Alif
+variants in the default configuration, since the difference is small and the
+variants carry grammatical information.
+
+\input{tables/ablation_factorial}
+
+\section{Register and byte fallback}
+\label{app:dialect}
+
+Table~\ref{tab:dialectal} reports fertility on three kinds of text: the
+\texttt{test} split, its lowest quality quartile, and 2{,}089 dialectal
+tweets from ArSarcasm \cite{abufarha2020arsarcasm}. The lowest quality
+quartile behaves like the full split for every tokenizer, because
+FineWeb2-HQ keeps only the top decile of FineWeb2 and even its weakest
+documents are Modern Standard Arabic. On dialectal tweets every tokenizer
+needs more tokens per word, and AraToken keeps the lowest fertility of all
+systems.
+
+A SentencePiece model without byte fallback maps a character outside its
+vocabulary to a single unknown token, which lowers its token count while
+dropping content. On the tweets this affects 5.1\% of words for AraToken and
+3.8\% for AraBERT. With byte fallback, AraToken encodes such a character as
+its UTF-8 bytes. Its dialectal fertility is then 2.51 against 3.21 for the
+tokenizer of Qwen3, 21.8\% lower, and every character is encoded. On Modern
+Standard Arabic byte fallback raises fertility by 0.3\%, from 1.213 to 1.216,
+and lowers the rate of unknown words from 0.31\% to zero. Inside LEP the
+byte-level vocabulary of Qwen3 covers every character, so the extended model
+has no unknown tokens in either case.
+
+\begin{table}[t]
+\centering
+\small
+\fitcolumn{\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Tokenizer} & \textbf{MSA} & \textbf{low-q} & \textbf{dialectal} & \textbf{ratio} \\
+\midrule
+Qwen3 / Qwen2.5 & 2.180 & 2.180 & 3.205 & 1.47 \\
+AraBERT & 1.835 & 1.838 & 3.003 & 1.64 \\
+AraToken, 95\% coverage & 1.281 & 1.276 & 2.563 & 2.00 \\
+AraToken, 150K, Alif unified & 1.208 & 1.207 & 2.332 & 1.93 \\
+AraToken, 150K & 1.213 & 1.212 & 2.359 & 1.94 \\
+AraToken, 150K, byte fallback & 1.216 & 1.216 & 2.506 & 2.06 \\
+\bottomrule
+\end{tabular}}
+\caption{Fertility by register, each tokenizer under its own normalization.
+MSA is the \texttt{test} split (3{,}000 documents), low-q its lowest quality
+quartile, and dialectal 2{,}089 ArSarcasm tweets; ratio is dialectal over
+MSA.}
+\label{tab:dialectal}
+\end{table}
+
+\section{What pruning removes}
+\label{app:pruning}
+
+Of the 28{,}443 Arabic pieces that the full vocabulary holds and the
+99\%-coverage vocabulary drops, 89\% have five or more characters, with a mean
+length of 6.4. Most of them are transliterated names and borrowings. The cost
+of pruning therefore falls on rare words (Table~\ref{tab:pruning_impact}). At
+99\% coverage fertility does not change on the thousand most frequent words
+and rises by about 0.7\%, 1.8\% and 4.2\% in the lower frequency bands. At
+95\% coverage the rise is 0.4\% on the most frequent words and 15.8\% on rare
+and unseen words. The 99\% vocabulary suits general use, and the 95\%
+vocabulary suits settings that are bound by memory and do not depend on rare
+names.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\fitcolumn{\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Frequency band} & \textbf{words} & \textbf{full} & \textbf{99\%} & \textbf{95\%} & \textbf{$\Delta$} \\
+\midrule
+top 1k            & 127{,}890 & 1.015 & 1.015 & 1.018 & $+0.4\%$ \\
+1k--10k           &  77{,}258 & 1.118 & 1.126 & 1.186 & $+6.0\%$ \\
+10k--100k         &  60{,}128 & 1.357 & 1.381 & 1.506 & $+11.0\%$ \\
+rare / unseen     &  34{,}724 & 2.317 & 2.415 & 2.683 & $+15.8\%$ \\
+\bottomrule
+\end{tabular}}
+\caption{Fertility of AraToken by word-frequency band on the \texttt{test}
+split; $\Delta$ compares the full vocabulary with 95\% coverage.}
+\label{tab:pruning_impact}
+\end{table}
+
+\section{Trainable set and adaptation baselines}
+\label{app:layers}
+
+Table~\ref{tab:layers} lists Arabic BPC for each trainable set of LEP. Two
+further configurations complete the picture. Training only the new rows, with
+every transformer layer frozen, gives 1.5575 BPC, close to the unadapted model
+at 1.5446: the network needs trainable layers to adapt to the new
+segmentation, which is why LEP trains the top layers. LoRA adapters
+\cite{hu2021lora} of rank 16 in place of trainable layers reach 2.7204 after
+2{,}000 steps. The English cost of adaptation also depends on the trainable
+set. At 2{,}000 steps English BPC is 1.0549 for CPT, 1.1313 for LEP with
+layers 24--27 and 1.1858 for LEP with all layers, against 1.0199 for the
+unadapted model.
+
+\input{tables/trainable_layers}
+
+\section{Task evaluation}
+\label{app:tasks}
+
+\subsection*{Scoring protocol}
+Models with different vocabularies need a scoring protocol that treats them
+alike. If a model scores the answer words themselves, the protocol depends on
+how each vocabulary spells them. Under the Qwen3 vocabulary the label words of
+our classification tasks cost one to four tokens, and under the extended
+vocabulary almost all of them cost one. The extended model then assigns each
+label a single probability over the whole vocabulary, while the base model
+spreads it over several easier steps, and rare label words lose. Normalizing
+by length in bytes does not remove this effect, because the number of
+decisions still differs.
+
+We therefore list the options with Arabic letters and score only the letter,
+which costs one token under both vocabularies. Letters bring a preference for
+fixed positions in the list \cite{zheng2024robust, pezeshkpour2023order}, and
+this preference differs between models: with a fixed option order, the
+unadapted model answers with one of the first two options on 95\% of the
+Arabic EXAMS items and LEP on 81\%, while the correct answers fall there for
+50\% of the items. We advance the option order by one position from item to
+item. After this rotation, the answers of each model are spread over the
+positions close to the distribution of the correct answers.
+
+\subsection*{OALL at the item level}
+Pooled over the 4{,}665 items of the suite, LEP reaches an accuracy of
+0.3914, against 0.3863 for the unadapted model and 0.3805 for CPT. No pairwise
+difference survives the Holm--Bonferroni correction; the largest, between LEP
+and CPT, is 1.1 points ($p = 0.16$).
+
+\subsection*{Classification and inference}
+Table~\ref{tab:downstream} reports Macro F1 on ASTD \cite{nabil2015astd},
+ArSarcasm \cite{abufarha2020arsarcasm}, SANAD \cite{einea2019sanad} and
+XNLI-ar \cite{conneau2018xnli}. The Chance column gives the Macro F1 of a
+predictor that draws labels from the gold label distribution. Two cells
+exceed it: CPT on binary sarcasm without demonstrations, 0.509 against 0.497,
+and LEP on seven-class topic classification with three demonstrations, 0.170
+against 0.144. On the other eight cells all three models score at or below
+this floor, so at 0.6B parameters these tasks do not separate the models.
+
+\input{tables/downstream}
+
+\subsection*{English retention}
+Table~\ref{tab:retention} measures English after adaptation at the
+500M-token budget. English BPC is 1.0199 for the unadapted model, 1.0675 for
+CPT and 1.1379 for LEP. Averaged over MMLU and ARC-Easy, accuracy is 0.75
+points below the unadapted model for CPT and 4.0 points below it for LEP.
+
+\input{tables/retention}
+
+\section{Training details}
+\label{app:hparams}
+
+Table~\ref{tab:training_config} lists the hyperparameters. Both run lengths
+use a global batch of 96 sequences of 1{,}024 tokens: the 2{,}000-step runs
+use one GPU with a per-device batch of 16 and six accumulation steps, and the
+500M-token runs use four GPUs with a per-device batch of 8 and three
+accumulation steps. Table~\ref{tab:params} gives the parameter counts and the
+peak memory, and Figure~\ref{fig:training_curves} shows the training and
+\texttt{dev} losses of the two 500M-token runs. The two panels have separate
+axes, because the two models count different tokens and their per-token
+losses are on different scales. Figure~\ref{fig:compression} complements
+Figure~\ref{fig:fertility} with compression.
+
+\begin{table}[t]
+\centering
+\small
+\fitcolumn{\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Base model & Qwen3-0.6B-Base \\
+Optimizer & AdamW, weight decay 0.01 \\
+Learning rate & $2\times10^{-4}$, linear schedule \\
+Warmup ratio & 0.1 \\
+Global batch & 96 sequences $\times$ 1{,}024 tokens \\
+Steps & 2{,}000 (comparisons); 5{,}086 (500M tokens) \\
+Trainable layers & 24--27 unless stated otherwise \\
+Original embedding rows & frozen by gradient masking \\
+Gradient checkpointing & enabled \\
+\bottomrule
+\end{tabular}}
+\caption{Hyperparameters of the adaptation runs.}
+\label{tab:training_config}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\fitcolumn{\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Quantity} & \textbf{CPT} & \textbf{LEP} \\
+\midrule
+Total parameters & 596M & 730M \\
+Added parameters & -- & 134M \\
+Trainable parameters & 62.9M & 197.0M \\
+Peak memory per device (GB) & 41 & 63 \\
+\bottomrule
+\end{tabular}}
+\caption{Parameter counts and peak memory at the 500M-token budget.}
+\label{tab:params}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/training_curves.pdf}
+\caption{Training and \texttt{dev} loss of the two 500M-token runs. The
+panels have separate axes because the two models count different tokens.}
+\label{fig:training_curves}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/compression_comparison.pdf}
+\caption{Compression of the three segmentation algorithms on the
+\texttt{test} split under four preprocessing configurations.}
+\label{fig:compression}
+\end{figure}
+
+
+%\section*{Acknowledgments}
+
+
+\bibliographystyle{ieeetr}
+\bibliography{bibs}
+
+\EOD
+\end{document}
