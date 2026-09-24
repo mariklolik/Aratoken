@@ -145,8 +145,8 @@ estimates reduces the initialization error whenever the two estimates
 disagree. The resulting hybrid initializer outperforms mean sub-token
 initialization and WECHSEL- and FOCUS-style initialization.
 \item We describe an evaluation protocol for models with different
-vocabularies, and we release the tokenizer, the training code and the model
-checkpoints.
+vocabularies, and we release the tokenizer, the training code, the data
+splits and the model checkpoints (Section~\ref{sec:availability}).
 \end{itemize}
 
 The rest of the paper is organized as follows. Section~\ref{sec:related}
@@ -911,6 +911,20 @@ raises English BPC to 1.138, against 1.068 for CPT; replaying English data or
 regularizing toward the original weights can limit this drift. We validate
 task accuracy at 0.6B parameters, where Arabic task suites separate models
 poorly.
+
+\subsection*{Data and code availability}
+\label{sec:availability}
+
+The code, the AraToken tokenizers, the identifiers of the \texttt{dev} and
+\texttt{test} documents and all measurements reported in this paper are
+available at \url{https://github.com/mariklolik/Aratoken}. The four document
+splits of FineWeb2-HQ used for tokenizer training, adaptation and evaluation
+are available at
+\url{https://huggingface.co/datasets/mariklolik/AraToken-FineWeb2-HQ-ar}.
+All tokenizers, including the extended Qwen3 tokenizers, are available at
+\url{https://huggingface.co/mariklolik/AraToken}, and the adapted Qwen3-0.6B
+and Qwen3-1.7B checkpoints with their continued-pretraining baselines at
+\url{https://huggingface.co/mariklolik}.
 
 \appendices
 
