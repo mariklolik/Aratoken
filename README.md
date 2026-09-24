@@ -213,6 +213,13 @@ python -m scripts.data.pretokenize --tokenizer Qwen/Qwen3-0.6B-Base --out data/p
 The same `lm-train` text is 448M tokens with the extended tokenizer and 803M with the Qwen3 tokenizer
 (`results/pretokenize_*.json`).
 
+The paper's code added tokens and read the Qwen3 vocabulary in hash order, which changes from run to
+run. This version sorts both by id. A rebuilt extended tokenizer therefore gets different ids for the
+new tokens, and every initializer except `mean` gives slightly different rows. With the released
+extended tokenizer from the Hub, `mean` reproduces the paper's initial model bit for bit, and training
+from the paper's initial models reproduces their first-step `dev` loss (9.1449 hybrid, 9.4787 mean).
+Use the Hub tokenizers with the released checkpoints.
+
 ### Training
 
 `make_grid` writes one manifest row per 2,000-step run: the Alif by learning-rate
@@ -254,7 +261,8 @@ python -m scripts.eval.start_loss
 python -m scripts.eval.init_norm --tokenizer $T
 
 python -m scripts.eval.intrinsic_metrics --report-morph
-python -m scripts.eval.intrinsic_metrics --registry configs/registry_algorithms.json --out results/intrinsic_algorithms.json
+python -m scripts.eval.intrinsic_metrics --registry configs/registry_algorithms.json --limit 2000 \
+    --out results/intrinsic_algorithms.json
 python -m scripts.eval.intrinsic_metrics --registry configs/registry_bytefallback.json --limit 2000 \
     --out results/intrinsic_bytefallback.json
 python -m scripts.eval.pruning_impact

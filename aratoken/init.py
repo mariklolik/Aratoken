@@ -57,10 +57,10 @@ def init_mean(emb, added, base_tok, sigma, old_n, seed, moment_matched: bool):
 
 def init_analogical(emb, added, base_tok, new_tok, sigma, method, topk, alpha):
     base_vocab = base_tok.get_vocab()
-    src_tokens = list(base_vocab)
+    src_tokens = sorted(base_vocab, key=base_vocab.get)
     if method == "focus":
         new_vocab = new_tok.get_vocab()
-        src_tokens = [t for t in base_vocab if t in new_vocab] or src_tokens
+        src_tokens = [t for t in src_tokens if t in new_vocab] or src_tokens
     src_ids = torch.tensor([base_vocab[t] for t in src_tokens])
     gram_index: dict[str, list[int]] = {}
     for j, t in enumerate(src_tokens):
@@ -100,7 +100,7 @@ def build(method: str, tok_path: str, out_path: Path, base: str,
     model.resize_token_embeddings(len(new_tok))
     emb = model.get_input_embeddings().weight
     sigma = emb[:old_n].float().std().item()
-    added = {i: t for t, i in new_tok.get_vocab().items() if i >= start}
+    added = dict(sorted((i, t) for t, i in new_tok.get_vocab().items() if i >= start))
     print(f"{method}: {old_n} -> {len(new_tok)} rows, {len(added)} initialized, sigma={sigma:.4f}")
 
     if method == "random":
