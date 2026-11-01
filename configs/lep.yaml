@@ -5,6 +5,7 @@ tokenizer_path: tokenizers/extended/fw2hq-alif-preserve-150k
 data_path: data/pretokenized/fw2hq-alif-preserve
 
 freeze_old_embeddings: true
+train_embeddings: false
 include_lm_head_freeze: true
 unfreeze_transformer_layers: [24, 25, 26, 27]
 lora_rank: 0
@@ -24,6 +25,7 @@ training:
   max_steps: 2000
   bf16: true
   dataloader_num_workers: 8
+  dataloader_drop_last: false
   eval_strategy: steps
   eval_steps: 125
   logging_strategy: steps

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainerCallback
 
@@ -35,8 +37,10 @@ class NoDecayEmbeddingsTrainer(Trainer):
         return self.optimizer
 
     def get_decay_parameter_names(self, model):
+        embeddings = {id(module.weight) for module in
+                      (model.get_input_embeddings(), model.get_output_embeddings()) if module is not None}
         return [name for name, p in model.named_parameters()
-                if p.requires_grad and "embed" not in name.lower() and "bias" not in name
+                if p.requires_grad and id(p) not in embeddings and "embed" not in name.lower() and "bias" not in name
                 and "norm" not in name.lower() and p.ndim >= 2]
 
 
@@ -82,8 +86,9 @@ def new_rows_start(model, tokenizer) -> int:
 
 def prepare_model(model_path: str, tokenizer_path: str, freeze_old_embeddings: bool,
                   include_lm_head_freeze: bool, trainable_layers: list[int],
-                  lora_rank: int = 0, lora_alpha: int = 32, device: str | None = None):
-    device = device or ("cuda:0" if torch.cuda.is_available() else "cpu")
+                  lora_rank: int = 0, lora_alpha: int = 32, device: str | None = None,
+                  train_embeddings: bool = False):
+    device = device or (f"cuda:{os.environ.get('LOCAL_RANK', '0')}" if torch.cuda.is_available() else "cpu")
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, trust_remote_code=True)
     model = load_causal_lm(model_path, device)
     rows = model.get_input_embeddings().weight.shape[0]
@@ -91,15 +96,20 @@ def prepare_model(model_path: str, tokenizer_path: str, freeze_old_embeddings: b
         raise ValueError(f"tokenizer has {len(tokenizer)} tokens, model has {rows} embedding rows")
 
     handles = []
-    if freeze_old_embeddings:
+    if freeze_old_embeddings or trainable_layers:
         freeze_all(model)
+    if freeze_old_embeddings or train_embeddings:
         model.get_input_embeddings().weight.requires_grad = True
+        output = model.get_output_embeddings()
+        if output is not None and (include_lm_head_freeze or train_embeddings):
+            output.weight.requires_grad = True
+    if freeze_old_embeddings:
         handles = install_freeze_hooks(model, new_rows_start(model, tokenizer), include_lm_head_freeze)
-    elif trainable_layers:
-        freeze_all(model)
     if freeze_old_embeddings or trainable_layers:
         unfreeze_layers(model, trainable_layers)
         model.enable_input_require_grads()
+    if train_embeddings and not freeze_old_embeddings and set(trainable_layers) == set(range(len(model.model.layers))):
+        model.requires_grad_(True)
 
     if lora_rank:
         from peft import LoraConfig, get_peft_model

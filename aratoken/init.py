@@ -89,24 +89,25 @@ def init_analogical(emb, added, base_tok, new_tok, sigma, method, topk, alpha):
 @torch.no_grad()
 def build(method: str, tok_path: str, out_path: Path, base: str,
           topk: int = 10, seed: int = 42, alpha: float = 0.5) -> None:
+    if not 0.0 <= alpha <= 1.0:
+        raise ValueError("alpha must be between 0 and 1")
     torch.manual_seed(seed)
     base_tok = AutoTokenizer.from_pretrained(base, trust_remote_code=True)
     new_tok = AutoTokenizer.from_pretrained(tok_path, trust_remote_code=True)
-    dtype = torch.bfloat16 if method == "mean" else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(base, torch_dtype=dtype, trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(base, torch_dtype=torch.float32, trust_remote_code=True)
 
     old_n = model.get_input_embeddings().weight.shape[0]
-    start = len(base_tok) if method == "mean" else old_n
+    start = len(base_tok)
     model.resize_token_embeddings(len(new_tok))
     emb = model.get_input_embeddings().weight
-    sigma = emb[:old_n].float().std().item()
+    sigma = emb[:start].float().std().item()
     added = dict(sorted((i, t) for t, i in new_tok.get_vocab().items() if i >= start))
     print(f"{method}: {old_n} -> {len(new_tok)} rows, {len(added)} initialized, sigma={sigma:.4f}")
 
     if method == "random":
         init_random(emb, added, sigma)
     elif method in ("mean", "calib"):
-        init_mean(emb, added, base_tok, sigma, old_n, seed, moment_matched=method == "calib")
+        init_mean(emb, added, base_tok, sigma, start, seed, moment_matched=method == "calib")
     elif method in ("wechsel", "focus", "hybrid"):
         init_analogical(emb, added, base_tok, new_tok, sigma, method, topk, alpha)
     else:
@@ -118,6 +119,11 @@ def build(method: str, tok_path: str, out_path: Path, base: str,
 
     model.config.lep_added_tokens_start = start
     model.config.lep_init_method = method
+    model.config.lep_init_seed = seed
+    model.config.lep_init_topk = topk
+    model.config.lep_init_alpha = alpha
+    model.config.lep_init_base = base
+    model.config.lep_init_tokenizer = tok_path
     out_path.mkdir(parents=True, exist_ok=True)
     model.to(torch.bfloat16).save_pretrained(str(out_path))
     print(f"wrote {out_path}")

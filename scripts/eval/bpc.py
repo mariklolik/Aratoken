@@ -18,6 +18,8 @@ def parse_args() -> argparse.Namespace:
                    help="en scores WikiText-103 for the English retention check.")
     p.add_argument("--limit", type=int, default=2000)
     p.add_argument("--max-len", type=int, default=1024)
+    p.add_argument("--common-text-chars", type=int,
+                   help="Score a shared normalized character prefix without token truncation (use 512).")
     p.add_argument("--device", default="cuda:0")
     p.add_argument("--n-bootstrap", type=int, default=10000)
     p.add_argument("--seed", type=int, default=42)
@@ -41,7 +43,7 @@ def main() -> int:
         model_path, _, tok_path = path.partition(":")
         tok = AutoTokenizer.from_pretrained(tok_path or model_path, trust_remote_code=True)
         model = load_causal_lm(model_path, a.device).eval()
-        vals, totals = per_doc_bpc(model, tok, texts, a.device, a.max_len)
+        vals, totals = per_doc_bpc(model, tok, texts, a.device, a.max_len, a.common_text_chars)
         results[tag] = {"bpc": bootstrap_ci(vals, a.n_bootstrap, a.seed), **totals, "vocab_size": len(tok),
                         "model_path": model_path, "tokenizer_path": tok_path or model_path}
         b = results[tag]["bpc"]
