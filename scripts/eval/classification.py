@@ -9,7 +9,7 @@ from sklearn.metrics import f1_score
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-LETTERS = ["أ", "ب", "ج", "د", "هـ"]
+LETTERS = ["أ", "ب", "ج", "د", "ه", "و", "ز"]
 
 
 def sentiment_header(labels):
@@ -92,6 +92,8 @@ def prompt_body(cfg: dict, text, labels, demos) -> str:
 
 def mcq_prompt(cfg: dict, text, demos, rotate: int) -> tuple[str, list[str], list[str]]:
     labels = list(cfg["labels"].values())
+    if not 1 <= len(labels) <= len(LETTERS):
+        raise ValueError(f"unsupported choice count: {len(labels)}")
     r = rotate % len(labels)
     order = labels[r:] + labels[:r]
     letters = LETTERS[:len(labels)]
