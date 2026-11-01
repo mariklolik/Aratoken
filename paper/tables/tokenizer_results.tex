@@ -7,22 +7,22 @@
 \textbf{Tokenizer} & \textbf{Fertility} & \textbf{Compression} & \textbf{OOV\%} \\
 \midrule
 \multicolumn{4}{l}{\textit{Diacritics removed}} \\
-BPE & 1.303 & 4.49 & 0.00 \\
-BPE + char.\ rules & 1.295 & 4.51 & 0.00 \\
+BPE & 1.303 & 4.49 & -- \\
+BPE + char.\ rules & 1.295 & 4.51 & -- \\
 Unigram & 1.253 & 4.66 & 0.14 \\
 \textbf{Unigram + char.\ rules} & 1.245 & 4.69 & 0.28 \\
 WordPiece & 1.304 & 4.48 & 0.00 \\
 WordPiece + char.\ rules & 1.296 & 4.51 & 0.00 \\
 \midrule
 \multicolumn{4}{l}{\textit{Diacritics kept}} \\
-BPE & 1.400 & 4.33 & 0.00 \\
-BPE + char.\ rules & 1.392 & 4.35 & 0.00 \\
+BPE & 1.400 & 4.33 & -- \\
+BPE + char.\ rules & 1.392 & 4.35 & -- \\
 Unigram & 1.286 & 4.62 & 0.15 \\
 Unigram + char.\ rules & 1.278 & 4.64 & 0.28 \\
 WordPiece & 1.402 & 4.32 & 0.00 \\
 WordPiece + char.\ rules & 1.395 & 4.34 & 0.00 \\
 \bottomrule
 \end{tabular}}
-\caption{Segmentation algorithms at an 80K vocabulary, trained on \texttt{tok-train} and measured on the \texttt{test} split. ``Char.\ rules'' adds the character rules of Table~\ref{tab:normalization}. Unigram with the full pipeline (bold) gives the lowest fertility and the highest compression. OOV is measured over 224{,}000 words.}
+\caption{Segmentation algorithms at an 80K vocabulary, trained on \texttt{tok-train} and measured on 2{,}000 \texttt{test} documents under each tokenizer's own normalization. ``Char.\ rules'' adds the character rules of Table~\ref{tab:normalization}. Unigram with the full pipeline (bold) gives the lowest fertility and the highest compression. OOV is scored on the first 500 documents, with 224{,}412--224{,}503 words depending on normalization. ``--'' means not scored (BPE has no usable UNK marker).}
 \label{tab:tokenizer_results}
 \end{table}
