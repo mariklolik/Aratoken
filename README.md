@@ -22,9 +22,10 @@ model. The added embedding rows start from the average of two estimates, one bui
 Qwen3 sub-tokens and one from similar whole Qwen3 tokens. The original rows stay frozen, and training
 touches only the new rows and the top four transformer layers.
 
-This repository has the code, the tokenizers and the measurements of the paper. The tables in the
-manuscript are generated from the JSON files in `results/`, and `scripts/paper/verify_numbers.py`
-checks the 62 numbers quoted in the text against the same files.
+This revision evaluates Arabic adaptation in a 78-run campaign with three training seeds, 49 checkpoint–task blocks and a six-checkpoint serving panel. The revision source accompanies this
+guide; its private run artifacts are supplied separately as `outputs/rebuttal/`. They are not claimed
+to be published on GitHub or Hugging Face. See [Reproducing the revision](#reproducing-the-revision)
+for the command and artifact map.
 
 <div align="center">
 <img src="paper/figures/segmentation_examples.png" width="88%" alt="The same Arabic words split by AraToken, AraBERT and the Qwen3 tokenizer">
@@ -33,24 +34,43 @@ checks the 62 numbers quoted in the text against the same files.
 
 ## Results
 
-Measured on the held-out `test` split. BPC is bits per character, which stays comparable when two
-models cut the same text into different tokens.
+Arabic tokenization improves from 2.179 to 1.212 tokens per word on the held-out test split
+(1.281 with the 60K pruned tokenizer). All six controlled Arabic BPC contrasts favor LEP over CPT:
 
-| | AraToken / LEP | Baseline |
-|---|---:|---|
-| Tokens per word | **1.212** | 2.179 Qwen3, 1.833 AraBERT |
-| Tokens per word, pruned to 60K pieces | **1.281** | 1.833 AraBERT (64K) |
-| Arabic BPC, Qwen3-0.6B, 500M training tokens | **1.322** | 1.405 continued pretraining (CPT) |
-| Arabic BPC, Qwen3-1.7B, 2,000 steps | **1.260** | 1.267 CPT |
-| Characters per token in training and generation | **4.43** | 2.59 Qwen3 |
-| Arabic BPC with the hybrid initializer, 2,000 steps | **1.347** | 1.358 WECHSEL-style, 1.358 FOCUS-style, 1.381 mean sub-token |
-| OALL v2 native-Arabic macro accuracy | **0.405** | 0.392 base model, 0.379 CPT |
+| Model | Steps | Trainable policy | LEP Arabic BPC | CPT Arabic BPC |
+|---|---:|---|---:|---:|
+| 0.6B | 2,000 | Top four | 1.4111 | 1.5138 |
+| 0.6B | 2,000 | Full | 1.2794 | 1.3780 |
+| 0.6B | 5,087 | Top four | 1.3551 | 1.4782 |
+| 0.6B | 5,087 | Full | 1.2197 | 1.3226 |
+| 1.7B | 2,000 | Top four | 1.3224 | 1.3577 |
+| 1.7B | 2,000 | Full | 1.2088 | 1.2699 |
 
-The BPC gaps between LEP and CPT hold under a paired bootstrap over test documents with
-Holm-Bonferroni correction (p < 0.0001 for Qwen3-0.6B, p < 0.001 for Qwen3-1.7B). LEP pays for this on
-English: after 500M tokens its WikiText-103 BPC is 1.138 against 1.068 for CPT.
+Values are means across seeds 1, 2 and 3 on the same 1,500 canonical Arabic documents, with prefixes
+of at most 512 Unicode characters; lower is better. All six contrasts survive the declared Holm
+correction. The nominal token budgets match, but text exposure, parameter counts and compute differ.
+The test set had already been inspected. The fixed half-weight initializer improves on both components
+at the original 0.6B budget and at 1.7B; its difference from the analogical component at the longer
+0.6B budget remains unresolved.
+
+On the five-task Arabic panel, LEP has the highest macro point estimate: **40.65%**, versus **39.58%**
+for CPT and **39.20%** for the base. The LEP–CPT macro difference is 1.07 percentage points
+(95% interval −0.81 to 2.94; Holm-adjusted p = 0.535); neither LEP macro comparison establishes an
+aggregate gain. LEP exceeds CPT on MadinahQA, ArabicEXAMS and AlGhafa, and is lower on ArabicMMLU
+and AraTrust. These are custom-protocol subset results, not official leaderboard scores.
+English macro accuracy is **62.92%** for LEP, **58.33%** for CPT and **66.65%** for the base:
+retention improves over CPT but remains below the unadapted base.
+
+LEP takes 23–28% more trainer time and more peak allocated memory than its paired CPT controls.
+The 78 successful runs sum to **272.5731 single-GPU trainer hours**. This includes in-loop validation
+and checkpointing, excludes preparation, initialization, final saving and separate evaluations, and
+is not an exact whole-campaign cost. The serving panel reports measured latency, token/character
+throughput and memory separately; tokenizer compression alone does not establish serving speed.
 
 ## Models and data
+
+The Hub model links below are **historical public checkpoints**, not the new campaign models.
+New final-step checkpoints remain private under `outputs/rebuttal/runs/<run>/model/final_model`; their identities are recorded in the supplied provenance. The example below loads a historical model.
 
 | | |
 |---|---|
@@ -100,7 +120,7 @@ flowchart LR
 | Normalization | `aratoken/normalizer.py` | A `tokenizers` normalizer applies NFKC, drops Tatweel, maps Arabic-Indic digits and Arabic punctuation to Latin forms and strips diacritics. Alif unification exists but is off by default, because the hamza position carries grammatical information. |
 | Tokenizer | `scripts/tokenizer/train.py`, `prune.py` | Unigram with 150,000 pieces on the `tok-train` split. Pruning keeps the most frequent pieces up to 99% or 95% corpus coverage (109,844 or 60,149 pieces). |
 | Extension | `aratoken/vocab.py` | Adds every AraToken piece that starts with an Arabic letter and is missing from the Qwen3 vocabulary. |
-| Initialization | `aratoken/init.py` | The compositional estimate c is the mean of the Qwen3 sub-token embeddings. The analogical estimate a is the overlap-weighted mean of the Qwen3 tokens that share the most character 2-4-grams. The new row is (c + a) / 2. Random, mean, moment-matched, WECHSEL-style and FOCUS-style initializers are there for the comparison. |
+| Initialization | `aratoken/init.py` | The compositional estimate c is the mean of the Qwen3 sub-token embeddings. The analogical estimate a is the overlap-weighted mean of the Qwen3 tokens that share the most character 2-4-grams. The new row is (c + a) / 2. The revision compares random, compositional mean, moment-matched mean, this analogical component and mixtures. Historical `wechsel`/`focus` options are lexical proxies, not implementations of the published methods. |
 | Training | `aratoken/training.py` | A backward hook zeroes the gradient of the original embedding rows. Qwen3 ties input and output embeddings, so this also freezes their output rows. |
 
 ## Repository layout
@@ -124,182 +144,135 @@ tests/               normalizer, split rule, gradient masking, tokenizer round t
 
 ## Setup
 
+Use the supplied revision source checkout as the working directory. Installing the public repository alone does not supply the private campaign artifacts or checkpoints.
+
 ```bash
-git clone https://github.com/mariklolik/Aratoken.git && cd Aratoken
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -e ".[eval,paper,test]"
 ```
 
-Installation takes about five minutes. We ran everything on Linux with CUDA 12, Python 3.11,
-PyTorch 2.5.1 and Transformers 4.51.3, and `pyproject.toml` pins these versions. FlashAttention 2 is
-used if it is installed. Commands below run from the repository root.
+The campaign used Linux, Python 3.11, PyTorch 2.5.1, Transformers 4.51.3 and datasets 4.0.0;
+package pins are in `pyproject.toml` and the full recorded environment is in
+`outputs/rebuttal/provenance/pip-freeze.txt`. Packed Arrow artifacts require the recorded datasets
+version. Training used one H100 80GB per process. No fresh full-install or hardware-minimum claim
+is implied by the recorded environment.
 
-| Stage | Hardware | Time |
-|---|---|---|
-| Tables, figures and the number check | any CPU | under a minute |
-| Tokenizer metrics | CPU, 16 GB RAM | 5-30 min per script |
-| Training the 150K tokenizer | CPU, 256 GB RAM | about 3 h |
-| One 2,000-step run, Qwen3-0.6B | 1 H100 80 GB | about 2 h |
-| One 2,000-step run, Qwen3-1.7B | 1 H100 80 GB | about 3.5 h |
-| One 500M-token run, Qwen3-0.6B | 4 H100 80 GB | 1.5-2.5 h |
-| The whole run grid (56 runs) | H100 | about 115 GPU-hours |
-
-## Quick check
-
-The first four commands need neither a GPU nor a download. The last one needs the `test` split and
-the extended tokenizers (see [Data](#data)). It recomputes Tables 3 and 5 in about five minutes on a
-CPU, and the numbers match `results/intrinsic_metrics.json` exactly.
-
-```bash
-pytest -q tests
-python -m scripts.paper.make_tables              # paper/tables/*.tex from results/
-python -m scripts.paper.make_figures             # paper/figures/*.pdf from results/
-python -m scripts.paper.verify_numbers           # 62/62 headline numbers match
-python -m scripts.eval.intrinsic_metrics --out outputs/intrinsic_metrics.json
-```
+`configs/lep.yaml` defaults to `training.report_to=none`, also set by the revision manifest.
+TensorBoard is optional: install it explicitly with `pip install tensorboard`, then pass
+`training.report_to=tensorboard` to `python -m scripts.lep.train` for a separately configured run.
+Do not alter the frozen manifest to enable it on an existing campaign.
 
 ## Data
 
 The corpus is the Arabic part of [FineWeb2-HQ](https://huggingface.co/datasets/epfml/FineWeb2-HQ)
-(ODC-By 1.0). Each document goes to `lm-train`, `tok-train`, `dev` or `test` by a hash of its id, so
-the splits cannot overlap. A MinHash check still finds a near-duplicate in the training splits for
-0.65% of the test documents. [`data/README.md`](data/README.md) has the split sizes.
+(ODC-By 1.0). Hash-based document-ID assignment separates `lm-train`, `tok-train`, `dev` and `test`.
+It does not rule out similar text under different IDs. MinHash retrieval found 43 candidate hits
+among 6,602 test documents (0.65%); these are candidate matches, not verified near duplicates.
+The zero exact-duplicate count concerns repetition within test, not a train–test duplicate guarantee.
+[`data/README.md`](data/README.md) has the split sizes.
 
 ```bash
 hf download mariklolik/AraToken-FineWeb2-HQ-ar --repo-type dataset --local-dir data/fineweb2hq-ar
 hf download mariklolik/AraToken --include "extended/*" --local-dir tokenizers
 ```
 
-`python -m scripts.data.build_splits` rebuilds the splits from FineWeb2-HQ. With
-`--ids data/splits/test_ids.txt data/splits/dev_ids.txt` it restores the paper's `test` and `dev`
-documents in their original order.
+The release's extended tokenizer fixes the added-token IDs. Use it with matching checkpoints.
+`python -m scripts.data.build_splits --ids data/splits/test_ids.txt data/splits/dev_ids.txt` restores those
+held-out documents in stored order; corpus rebuilding and fresh tokenizer training are not promises
+of identical bytes. The campaign input inventory and recheck are
+`provenance/input-artifacts.json` and `provenance/input-artifacts-recheck.json` inside the artifact root.
 
-## Reproducing the paper
+## Reproducing the revision
 
-Each step writes the file in `results/` that ships with the repository, so a rerun can be compared
-with the published one directly.
+The artifact root below is `outputs/rebuttal/`, supplied separately. Preserve its raw files and
+receipts. Aggregation needs the manifest, all 78 run records/metrics and 156 BPC files, the frozen
+cohort, all 49 task files and the base English BPC file. Downstream validation checks recorded
+absolute model paths as well as hashes; moving the artifact tree is not automatically portable.
+Use the recorded path layout for validation, and do not silently rewrite provenance to make it pass.
+Inspect the recorded environment and source archives before attempting a fresh scientific rerun.
 
-### Tokenizers
+### Existing-results checks and table export
 
-```bash
-python -m scripts.tokenizer.train sp tokenizers/fw2hq_sp_alif_preserve --drop-diacritics --preserve-alif-forms
-python -m scripts.tokenizer.train sp tokenizers/fw2hq_sp_alif_preserve_bf --drop-diacritics --preserve-alif-forms --byte-fallback
-python -m scripts.tokenizer.train sp tokenizers/fw2hq_sp_alif_unified --drop-diacritics
-python -m scripts.tokenizer.prune tokenizers/fw2hq_sp_alif_preserve --coverage 0.99 0.95
-python -m scripts.tokenizer.prune tokenizers/fw2hq_sp_alif_unified --coverage 0.99 0.95
-sbatch --array=1-12 slurm/tokenizer_grid.sbatch      # BPE, WordPiece, Unigram at 80K under 4 preprocessing settings
-```
-
-### Extended tokenizers, initial models and pretokenized data
+These commands do not train or run model inference. They write new summaries/tables under `outputs/reproduction-check/`, leaving the supplied aggregates intact.
 
 ```bash
-T=tokenizers/extended/fw2hq-alif-preserve-150k
-U=tokenizers/extended/fw2hq-alif-unified-150k
-python -m scripts.tokenizer.extend_qwen --sentencepiece tokenizers/fw2hq_sp_alif_preserve/sentencepiece.model --out $T
-python -m scripts.tokenizer.extend_qwen --sentencepiece tokenizers/fw2hq_sp_alif_unified/sentencepiece.model --out $U --unify-alif
-
-for M in mean calib random wechsel focus hybrid; do
-  python -m scripts.lep.init_embeddings --method $M --tokenizer $T --out models/qwen3-0.6b-fw2hq-alif-preserve-150k-$M
-done
-python -m scripts.lep.init_embeddings --method mean --tokenizer $U --out models/qwen3-0.6b-fw2hq-alif-unified-150k-mean
-python -m scripts.lep.init_embeddings --method hybrid --tokenizer $T --base Qwen/Qwen3-1.7B-Base \
-    --out models/qwen3-1.7b-fw2hq-alif-preserve-150k-hybrid
-
-python -m scripts.data.pretokenize --tokenizer $T --out data/pretokenized/fw2hq-alif-preserve
-python -m scripts.data.pretokenize --tokenizer $U --out data/pretokenized/fw2hq-alif-unified
-python -m scripts.data.pretokenize --tokenizer Qwen/Qwen3-0.6B-Base --out data/pretokenized/fw2hq-qwen
+python -m scripts.eval.rebuttal_summary --manifest outputs/rebuttal/manifest.tsv \
+    --out outputs/reproduction-check/summary.json
+python -m scripts.eval.downstream_summary --root outputs/rebuttal \
+    --cohort outputs/rebuttal/downstream-v1/cohort.json \
+    --out outputs/reproduction-check/downstream-summary.json
+python -m scripts.paper.rebuttal_tables --summary outputs/reproduction-check/summary.json \
+    --downstream outputs/reproduction-check/downstream-summary.json \
+    --out outputs/reproduction-check/paper-tables
 ```
 
-The same `lm-train` text is 448M tokens with the extended tokenizer and 803M with the Qwen3 tokenizer
-(`results/pretokenize_*.json`).
+Check for all 78 runs and complete contrast families in the BPC summary and `status: complete` for
+the nine-test downstream family. An incomplete or invalid receipt is not a reproduced result.
+These checks validate supplied records and recompute statistics; they do not independently reproduce
+training or evaluation. The table exporter emits per-seed and per-checkpoint/task CSVs, LaTeX tables
+and a hash receipt. Historical `make_tables` and `verify_numbers` are not revision-wide verification.
 
-The paper's code added tokens and read the Qwen3 vocabulary in hash order, which changes from run to
-run. This version sorts both by id. A rebuilt extended tokenizer therefore gets different ids for the
-new tokens, and every initializer except `mean` gives slightly different rows. With the released
-extended tokenizer from the Hub, `mean` reproduces the paper's initial model bit for bit, and training
-from the paper's initial models reproduces their first-step `dev` loss (9.1449 hybrid, 9.4787 mean).
-Use the Hub tokenizers with the released checkpoints.
+### Fresh adaptation campaign
 
-### Training
-
-`make_grid` writes one manifest row per 2,000-step run: the Alif by learning-rate
-factorial, five trainable sets, five initializers, embeddings only, LoRA rank 16, CPT at equal compute
-and at equal text, and the Qwen3-1.7B pair. Every run also logs the `dev` loss after the first step,
-which is the first-step loss of Table 7.
+Use a separate checkout/artifact tree with the pinned input models, tokenizers and packed data.
+The manifest generator refuses to overwrite a manifest. Its 78 rows cover three seeds at each of
+three settings: 0.6B/2,000 steps, 0.6B/5,087 steps and 1.7B/2,000 steps. Each includes five
+initializer arms, top-four CPT and fully trainable LEP/CPT; the first setting adds two mixture weights.
 
 ```bash
-python -m scripts.lep.make_grid                       # outputs/grid/manifest.tsv, 56 runs
-sbatch --array=1-56 slurm/train.sbatch
-sbatch slurm/train_500m.sbatch preserve               # LEP, 500M tokens
-sbatch slurm/train_500m.sbatch cpt                    # CPT, 500M tokens
+python -m scripts.lep.rebuttal_grid --out outputs/rebuttal/manifest.tsv --seeds 1 2 3
+python -m scripts.lep.run_rebuttal --manifest outputs/rebuttal/manifest.tsv --gpu 0
 ```
 
-### Measurements
+The second command starts training and BPC evaluation on the selected free GPU. The runner owns
+initialization, resume/claim handling, final-step selection and 1,500 Arabic/1,000 English common-text
+BPC evaluations per run. It writes `runs/<name>/run.json`, `model/run_metrics.json`, `bpc_ar.json`,
+`bpc_en.json`, `complete.json` and the append-only `events.jsonl`. It does not run the task or serving
+panels. Do not substitute the historical `make_grid` or Slurm 56-run recipe.
 
-```bash
-python -m scripts.eval.bpc_grid --min-step 2000                        # results/grid_bpc_with_init.json
-python -m scripts.eval.bpc_grid --only '^scale17' --base-model Qwen/Qwen3-1.7B-Base --out results/grid_bpc_scale17.json
-python -m scripts.eval.bpc_grid --grid-dir outputs/flagship --out results/grid_bpc_flagship_paired.json
+### Task, serving and resource contracts
 
-Q=Qwen/Qwen3-0.6B-Base
-LEP=outputs/flagship/preserve_s1/model/checkpoint-5086:$T
-CPT=outputs/flagship/cpt_s1/model/checkpoint-5086:$Q
-python -m scripts.eval.bpc --limit 1500 --out results/bpc_flagship.json \
-    --model base=$Q --model flagship_preserve_500M=$LEP --model flagship_cpt_500M=$CPT
-python -m scripts.eval.bpc --lang en --limit 1000 --out results/bpc_english_flagship.json \
-    --model base=$Q --model flagship_preserve_500M=$LEP --model flagship_cpt_500M=$CPT
-
-L=factorial_preserve_lr2e-4
-python -m scripts.eval.stats_bpc --contrast $L:baseline_cpt_origtok --contrast $L:baseline_cpt_equaltext \
-    --contrast init_hybrid:$L --contrast init_hybrid:init_wechsel --contrast init_hybrid:init_focus \
-    --contrast init_hybrid:init_calib --contrast init_hybrid:init_random
-python -m scripts.eval.stats_bpc --bpc results/grid_bpc_flagship_paired.json --contrast preserve:cpt \
-    --out results/stats_flagship.json
-python -m scripts.eval.stats_bpc --bpc results/grid_bpc_scale17.json --baseline __base_qwen3_1.7b \
-    --contrast scale17hyb_lep:scale17full_cpt --out results/stats_scale17.json
-python -m scripts.eval.start_loss
-python -m scripts.eval.init_norm --tokenizer $T
-
-python -m scripts.eval.intrinsic_metrics --report-morph
-python -m scripts.eval.intrinsic_metrics --registry configs/registry_algorithms.json --limit 2000 \
-    --out results/intrinsic_algorithms.json
-python -m scripts.eval.intrinsic_metrics --registry configs/registry_bytefallback.json --limit 2000 \
-    --out results/intrinsic_bytefallback.json
-python -m scripts.eval.pruning_impact
-python -m scripts.eval.dialectal_fertility
-
-python -m scripts.eval.oall --model <checkpoint> --tokenizer <tokenizer> --tag lep             # also base, cpt
-python -m scripts.eval.oall --lang en --model <checkpoint> --tokenizer <tokenizer> --tag lep
-python -m scripts.eval.stats_oall
-sbatch slurm/classification.sbatch <checkpoint> lep_flagship_500m                                # also base, CPT
-python -m scripts.eval.collect_classification && python -m scripts.eval.stats_classification
-
-python -m scripts.paper.make_tables && python -m scripts.paper.make_figures && python -m scripts.paper.verify_numbers
-```
-
-### Where each result comes from
-
-| Paper | Script | Result file |
+| Revision result | Existing entrypoint or receipt | Required artifact |
 |---|---|---|
-| Fig. 1, segmentation examples | `scripts/paper/segmentation_examples.py` | `paper/figures/segmentation_examples.pdf` |
-| Fig. 5, norm shrinkage (Prop. 1) | `scripts/eval/init_norm.py` | `results/init_norm_shrinkage.json` |
-| Table 3, Fig. 6, AraToken against other tokenizers | `scripts/eval/intrinsic_metrics.py` | `results/intrinsic_metrics.json` |
-| Table 4, Figs. 7 and 12, algorithm by preprocessing | `scripts/eval/intrinsic_metrics.py --registry` | `results/intrinsic_algorithms.json` |
-| Table 5, Fig. 8, pruning | `scripts/eval/intrinsic_metrics.py` | `results/intrinsic_metrics.json` |
-| Table 6, Arabic BPC of LEP and CPT | `scripts/eval/bpc_grid.py`, `bpc.py` | `results/grid_bpc_with_init.json`, `bpc_flagship.json`, `grid_bpc_scale17.json` |
-| Table 7, Fig. 10, initializers | `scripts/eval/bpc_grid.py`, `start_loss.py` | `results/grid_bpc_with_init.json`, `init_start_loss.json` |
-| Table 8, text per token | `scripts/eval/bpc.py`, `scripts/data/pretokenize.py` | `results/bpc_flagship.json`, `pretokenize_*.json` |
-| Table 9, OALL v2 | `scripts/eval/oall.py`, `stats_oall.py` | `results/oall/mcq/`, `stats_oall.json` |
-| Table 10, Alif handling by learning rate | `scripts/eval/stats_bpc.py` | `results/stats.json` |
-| Table 11, register and byte fallback | `scripts/eval/dialectal_fertility.py` | `results/dialectal_fertility.json`, `intrinsic_bytefallback.json` |
-| Table 12, pruning cost by word frequency | `scripts/eval/pruning_impact.py` | `results/pruning_impact.json` |
-| Table 13, Fig. 9, trainable set | `scripts/eval/bpc_grid.py`, `bpc.py --lang en` | `results/grid_bpc_with_init.json`, `bpc_english.json` |
-| Table 14, classification and inference | `scripts/eval/classification.py` | `results/downstream_preds_mcq/`, `downstream.json`, `stats_downstream.json` |
-| Table 15, English retention | `scripts/eval/bpc.py --lang en`, `oall.py --lang en` | `results/bpc_english_flagship.json`, `oall/mcq/en/` |
-| Fig. 11, training curves | `scripts/paper/make_figures.py` | `results/curves/` |
-| Significance tests | `scripts/eval/stats_bpc.py` | `results/stats.json`, `stats_flagship.json`, `stats_scale17.json` |
-| Near-duplicate check (App. A) | `scripts/data/minhash_report.py` | `results/minhash_leakage.json` |
-| Numbers quoted in the text | `scripts/paper/verify_numbers.py` | `paper/manuscript.tex` against `results/` |
+| Six controlled LEP–CPT Arabic BPC contrasts, twelve initializer contrasts and alpha sweep | `scripts.eval.rebuttal_summary`; `scripts.paper.rebuttal_tables` | `manifest.tsv`, `runs/`, `summary.json` |
+| Seven checkpoints × seven tasks = 49 blocks | Archived `run_task_panel.py` calls `scripts.eval.oall`; `scripts.eval.downstream_summary` aggregates | `downstream-v1/cohort.json`, `downstream-v1/mcq/`, completion receipts, `base06_common_en.json` |
+| Six serving checkpoints | `scripts.eval.inference`; exact model arguments in `serving-final-launch.json` | `serving-final.json`, model provenance |
+| Successful training resources and serving tables | Supplied `provenance/render_resource_tables.py` | `resource-audit.json`, run metrics, `serving-final.json`, `paper-tables/serving-provenance.json` |
+| Source/input/model binding | Source archives, input inventories and completion checks | `provenance/` and each run's receipts |
+
+The task controller and cohort-freezing helper are preserved in `provenance/task-control-scripts.tar.gz`. The controller accepts one tag from
+`b06`, `l500t1`, `l500t2`, `l500t3`, `c500t1`, `c500t2`, `c500t3`; it expects the frozen cohort and
+registered final models in the campaign layout. It runs both languages with `--protocol mcq --limit 1000`
+and checks each task against its frozen ordered items, gold labels and protocol. A new campaign needs
+its own recorded model identities; the old receipt does not certify newly trained weights.
+
+The serving CLI accepts repeated `--model TAG=MODEL[:TOKENIZER]` and requires `--out`. The recorded
+panel uses `base06`, `cpt06`, `lep06`, `base17`, `cpt17`, `lep17`, 32 shared 256-character prompts,
+batches 1 and 4, two warmups and 128 generated tokens on one exclusively used H100 80GB. Adapted
+models are seed 1 of the longer 0.6B and original 1.7B top-four arms. Read `serving-final-launch.json`
+for pinned base paths and complete arguments. Task and serving reruns perform model inference;
+they are separate from the CPU checks above. Latencies are batch means, not per-request tail latency.
+
+The supplied resource renderer uses the fixed `outputs/rebuttal/` layout and writes resource/serving
+LaTeX plus provenance to its `paper-tables/` directory. Run it only in a copy of the artifact tree:
+`PYTHONPATH=. python outputs/rebuttal/provenance/render_resource_tables.py`. Its outputs supplement
+`rebuttal_tables`; they are not produced by that entrypoint. Failed and quarantined attempts remain
+separate from the 272.5731-hour successful-training sum.
+
+### Historical artifacts
+
+Historical raw results, scripts and public checkpoints remain available for inspection. Their
+1,024-token-truncated BPC scores do not compare identical text across tokenizers and are retired from
+the active controlled comparison. Historical `wechsel` and `focus` measurements are lexical-proxy
+diagnostics, not evidence against the published WECHSEL or FOCUS methods.
+
+Old non-mean initialization states cannot be reconstructed exactly from the historical recipe and
+seed: vocabulary/donor iteration order was not preserved. We retire the old exact-reconstruction and
+first-step-loss recipe rather than claim that the new campaign recovers those bytes. Reuse released
+historical tokenizer/checkpoint pairs together. The new campaign instead has explicit initializer
+specifications, fixed tokenizer IDs and pinned run/input/model receipts. These establish its own
+provenance, not retroactive provenance for the historical states.
 
 ## Citation
 
@@ -316,13 +289,12 @@ The paper is under review at IEEE Access. We will add the journal reference here
 
 ## License
 
-Code, tokenizers and models are released under the [Apache License 2.0](LICENSE), the license of
+Public code, tokenizer and model releases use the [Apache License 2.0](LICENSE), the license of
 Qwen3. The FineWeb2-HQ splits keep their ODC-By 1.0 license, and the evaluation datasets keep their
 own licenses.
 
 ## Acknowledgments
 
-This work was supported by a grant of the Ministry of Economic Development of the Russian Federation
-(agreement No. 139-15-2025-011 of June 20, 2025, identifier 000000C313925P4G0002).
+This work was supported by a grant of the Ministry of Economic Development of the Russian Federation (agreement No. 139-15-2025-011 of June 20, 2025, identifier 000000C313925P4G0002).
 
 Questions go to Mark Kashirskiy, 353056@niuitmo.ru, or to the issue tracker.
