@@ -183,10 +183,11 @@ def table_downstream(data: dict, cols: list) -> str:
         r"\begin{tabular}{@{}l" + "r" * (len(cols) + 1) + r"@{}}", r"\toprule",
         r"\textbf{Benchmark (Macro F1)} & " + head + r" \\",
         r"\midrule", *rows, r"\bottomrule", r"\end{tabular}",
-        r"\caption{Macro F1 on the Arabic classification and inference tasks, "
+        r"\caption{Historical fixed-checkpoint Macro F1 on Arabic classification and inference tasks, "
         r"mean over three evaluation seeds. The Chance column is the Macro F1 of "
         r"a predictor that draws labels from the gold label distribution, and "
-        r"bold cells exceed it. Options are scored by their letter, with the "
+        r"bold cells exceed this descriptive reference, without a significance claim. "
+        r"Options are scored by their letter, with the "
         r"option order rotated from item to item.}",
         r"\label{tab:downstream}", r"\end{table}",
     ])
