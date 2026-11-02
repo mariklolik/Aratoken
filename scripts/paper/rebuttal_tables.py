@@ -11,11 +11,11 @@ from scripts.lep.rebuttal_grid import rebuttal_rows
 SETTINGS = {"small": ("0.6B", "2,000"), "budget500m": ("0.6B", "5,087"),
             "scale17": ("1.7B", "2,000")}
 METHODS = {"mean": "Compositional mean", "calib": "Moment-matched mean",
-           "analogical": "Character-ngram analogical proxy", "hybrid": "Half mixture",
+           "analogical": "Character-ngram analogical proxy", "hybrid": "Half mixture (ours)",
            "random": "Random"}
 ARABIC = (r"Arabic macro document BPC on 1,500 shared canonical documents, each truncated "
           r"to at most 512 Unicode characters. Lower BPC is better. ")
-SEEDS = r"Values are means $\pm$ sample SD across three paired training seeds. "
+SEEDS = r"Values are means $\pm$ sample standard deviation (SD) across three paired training seeds. "
 HELDOUT = r"The held-out data had previously been inspected. "
 INFERENCE = (r"Intervals are 95\% marginal crossed seed/document bootstrap intervals "
              r"over three paired training seeds and 1,500 shared documents; "
@@ -88,20 +88,21 @@ def export(result: dict, output: Path) -> list[str]:
             initializer_inference.append([size, steps, METHODS[method], *inference_cells(contrast)])
     contents = {
         "fair-estimates.tex": table(
-            ["Model", "Steps", "Trainability", "CPT Arabic", "LEP Arabic", "CPT English", "LEP English"],
+            ["Model", "Steps", "Trainability", r"CPT Arabic $\downarrow$", r"LEP Arabic $\downarrow$",
+             r"CPT English $\downarrow$", r"LEP English $\downarrow$"],
             estimates, ARABIC + SEEDS + r"English uses 1,000 canonical documents with the same prefix rule "
             r"and is descriptive. Top-four LEP updates new embedding rows and the last four transformer layers; "
             r"CPT updates all original embedding rows and the same layers. Full pairs update all parameters. "
-            r"LEP uses the predeclared half mixture. Matched nominal packed-token budgets do not imply equal compute "
+            r"LEP (ours) uses the predeclared half mixture. Matched nominal packed-token budgets do not imply equal compute "
             r"or text exposure. " + HELDOUT, "tab:rebuttal-fair-estimates"),
         "fair-inference.tex": table(
-            ["Model", "Steps", "Trainability", r"$\Delta$ BPC", r"95\% interval", r"Holm $p$"],
-            fair_inference, ARABIC + r"LEP minus CPT for all six trainability comparisons. "
+            ["Model", "Steps", "Trainability", r"$\Delta$ BPC $\downarrow$", r"95\% interval", r"Holm $p$"],
+            fair_inference, ARABIC + r"LEP (ours) minus CPT for all six trainability comparisons. "
             r"Negative differences favor LEP. " + INFERENCE + r"Holm correction covers the six planned "
             r"fairness contrasts. " + HELDOUT, "tab:rebuttal-fair-inference"),
         "initializer-inference.tex": table(
-            ["Model", "Steps", "Comparator", r"$\Delta$ BPC", r"95\% interval", r"Holm $p$"],
-            initializer_inference, ARABIC + r"Half-mixture LEP minus each initializer comparator, with "
+            ["Model", "Steps", "Comparator", r"$\Delta$ BPC $\downarrow$", r"95\% interval", r"Holm $p$"],
+            initializer_inference, ARABIC + r"Half-mixture LEP (ours) minus each initializer comparator, with "
             r"the top-four training policy. Negative differences favor the half mixture. " + INFERENCE
             + r"Holm correction covers all 12 planned initializer contrasts. " + HELDOUT,
             "tab:rebuttal-initializer-inference"),
@@ -113,7 +114,9 @@ def export(result: dict, output: Path) -> list[str]:
             r"English macro document BPC on 1,000 shared canonical documents, each truncated to at most "
             r"512 Unicode characters. Lower BPC is better. English results are descriptive only. ")
         contents[f"initializer-{language}.tex"] = table(
-            ["Initializer", "0.6B / 2,000 steps", "0.6B / 5,087 steps", "1.7B / 2,000 steps"],
+            ["Initializer", r"\shortstack{0.6B / 2,000 steps\\BPC $\downarrow$}",
+             r"\shortstack{0.6B / 5,087 steps\\BPC $\downarrow$}",
+             r"\shortstack{1.7B / 2,000 steps\\BPC $\downarrow$}"],
             rows, scope + SEEDS + r"All five predeclared initializers use the top-four training policy. "
             r"The analogical initializer is a character-ngram proxy. No initializer is selected from "
             r"these results. " + HELDOUT, f"tab:rebuttal-initializer-{language}")
@@ -121,7 +124,7 @@ def export(result: dict, output: Path) -> list[str]:
              (.5, "hybrid", METHODS["hybrid"]), (.75, "alpha075", "Three-quarters compositional"),
              (1., "mean", METHODS["mean"])]
     contents["alpha-sweep.tex"] = table(
-        [r"$\alpha$", "Initializer", "Arabic BPC", "English BPC"],
+        [r"$\alpha$", "Initializer", r"Arabic BPC $\downarrow$", r"English BPC $\downarrow$"],
         [[f"{alpha:.2f}", label, *[mean_sd(groups[f"small_{method}"], language) for language in ("ar", "en")]]
          for alpha, method, label in sweep],
         ARABIC + SEEDS + r"Complete exploratory five-point mixture sweep at 0.6B, 2,000 steps, top-four "
@@ -189,23 +192,24 @@ def export_downstream(result: dict, output: Path) -> list[str]:
 
     for language, tasks in TASKS.items():
         for task in tasks:
-            estimates.append([task, f"{counts[language][task]:,}", *cells({
+            estimates.append([r"$\uparrow$ " + task, f"{counts[language][task]:,}", *cells({
                 tag: model["tasks"][language][task]["accuracy"] for tag, model in models.items()})])
             for tag, model in models.items():
                 records.append({"checkpoint": tag, "training_seed": model["training_seed"], "run": model["run"],
                                 "language": language, "task": task, **model["tasks"][language][task]})
     for language, label in (("ar", "Arabic macro"), ("en", "English macro")):
-        estimates.append([label, f"{sum(counts[language].values()):,}", *cells({
+        estimates.append([r"$\uparrow$ " + label, f"{sum(counts[language].values()):,}", *cells({
             tag: model["macro_accuracy"][language] for tag, model in models.items()})])
-    estimates.append(["English BPC", "1,000", *cells({tag: model["en_bpc"]["mean"] for tag, model in models.items()})])
-    for endpoint, label in (("ar_accuracy", "Arabic macro"), ("en_accuracy", "English macro"), ("en_bpc", "English BPC")):
+    estimates.append([r"$\downarrow$ English BPC", "1,000", *cells({tag: model["en_bpc"]["mean"] for tag, model in models.items()})])
+    for endpoint, label in (("ar_accuracy", r"$\uparrow$ Arabic macro"), ("en_accuracy", r"$\uparrow$ English macro"),
+                            ("en_bpc", r"$\downarrow$ English BPC")):
         for pair, (left, right) in PAIRS.items():
             contrast = result["contrasts"][f"{endpoint}:{pair}"]
             units = "BPC" if endpoint == "en_bpc" else "percentage points"
             inference_rows.append([label, pair.upper(), units, *inference_cells(contrast)])
-    caption = (r"Qwen3-0.6B: fixed base and three training seeds per adapted arm at 5,087 steps, top-four policy. "
+    caption = (r"Qwen3-0.6B with LEP (ours): fixed base and three training seeds per adapted arm at 5,087 steps, top-four policy. "
                r"Base is one fixed checkpoint, not three independent runs. Adapted values are seed means $\pm$ "
-               r"sample SD. Task accuracies and task macros are percentages (higher is better); macros weight "
+               r"sample standard deviation (SD). Task accuracies and task macros are percentages (higher is better); macros weight "
                r"the five Arabic or two English tasks equally. $n$ is the exact item count per task, summed "
                r"item count for each macro, or document count for BPC. English BPC uses canonical prefixes "
                r"of at most 512 Unicode characters (lower is better). All 49 checkpoint/task blocks are included. "
@@ -216,7 +220,7 @@ def export_downstream(result: dict, output: Path) -> list[str]:
             "tab:rebuttal-downstream-estimates"),
         "downstream-inference.tex": table(
             ["Endpoint", "Contrast", "Units", "Difference", r"95\% interval", r"Holm $p$"],
-            inference_rows, r"All nine predeclared downstream contrasts; differences are left minus right. "
+            inference_rows, r"All nine predeclared downstream contrasts including LEP (ours); differences are left minus right. "
             r"Positive accuracy differences (percentage points) and negative BPC differences favor the left arm. "
             r"95\% marginal bootstrap intervals share three paired training-seed draws and resample paired "
             r"items within the seven fixed tasks, without task resampling; English BPC uses crossed paired "

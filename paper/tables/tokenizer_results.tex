@@ -2,9 +2,9 @@
 \begin{table}[t]
 \centering
 \small
-\fitcolumn{\begin{tabular}{lccc}
+\fitcolumn{\fitcolumn{\begin{tabular}{lccc}
 \toprule
-\textbf{Tokenizer} & \textbf{Fertility} & \textbf{Compression} & \textbf{OOV\%} \\
+\textbf{Tokenizer} & \textbf{Fertility} $\downarrow$ & \textbf{Compression} $\uparrow$ & \textbf{OOV\%} $\downarrow$ \\
 \midrule
 \multicolumn{4}{l}{\textit{Diacritics removed}} \\
 BPE & 1.303 & 4.49 & -- \\
@@ -22,7 +22,7 @@ Unigram + char.\ rules & 1.278 & 4.64 & 0.28 \\
 WordPiece & 1.402 & 4.32 & 0.00 \\
 WordPiece + char.\ rules & 1.395 & 4.34 & 0.00 \\
 \bottomrule
-\end{tabular}}
-\caption{Segmentation algorithms at an 80K vocabulary, trained on \texttt{tok-train} and measured on 2{,}000 \texttt{test} documents under each tokenizer's own normalization. ``Char.\ rules'' adds the character rules of Table~\ref{tab:normalization}. Unigram with the full pipeline (bold) gives the lowest fertility and the highest compression. OOV is scored on the first 500 documents, with 224{,}412--224{,}503 words depending on normalization. ``--'' means not scored (BPE has no usable UNK marker).}
+\end{tabular}}}
+\caption{Segmentation algorithms at an 80K vocabulary, trained on \texttt{tok-train} and measured on 2{,}000 \texttt{test} documents under each tokenizer's own normalization. ``Char.\ rules'' adds the character rules of Table~\ref{tab:normalization}. Unigram with the full AraToken pipeline (ours) (bold) gives the lowest fertility and the highest compression. Out-of-vocabulary (OOV) rate is scored on the first 500 documents, with 224{,}412--224{,}503 words depending on normalization. ``--'' means not scored (BPE has no usable unknown-token (UNK) marker).}
 \label{tab:tokenizer_results}
 \end{table}
