@@ -1,0 +1,22 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Endpoint & Contrast & Units & Difference & 95\% interval & Holm $p$ \\
+\midrule
+$\uparrow$ Arabic macro & LEP-CPT & percentage points & +1.0747 & [-0.8117, +2.9381] & 0.534547 \\
+$\uparrow$ Arabic macro & LEP-BASE & percentage points & +1.4560 & [-0.3139, +3.2868] & 0.336866 \\
+$\uparrow$ Arabic macro & CPT-BASE & percentage points & +0.3813 & [-1.3659, +2.1642] & 0.681932 \\
+$\uparrow$ English macro & LEP-CPT & percentage points & +4.5833 & [+1.6163, +7.4500] & 0.010399 \\
+$\uparrow$ English macro & LEP-BASE & percentage points & -3.7333 & [-5.7667, -1.7667] & 0.00249975 \\
+$\uparrow$ English macro & CPT-BASE & percentage points & -8.3167 & [-10.7500, -5.9167] & 0.00089991 \\
+$\downarrow$ English BPC & LEP-CPT & BPC & -0.0270 & [-0.0294, -0.0246] & 0.00089991 \\
+$\downarrow$ English BPC & LEP-BASE & BPC & +0.0219 & [+0.0201, +0.0236] & 0.00089991 \\
+$\downarrow$ English BPC & CPT-BASE & BPC & +0.0489 & [+0.0463, +0.0514] & 0.00089991 \\
+\bottomrule
+\end{tabular}
+\caption{All nine predeclared downstream contrasts including LEP (ours); differences are left minus right. Positive accuracy differences (percentage points) and negative BPC differences favor the left arm. 95\% marginal bootstrap intervals share three paired training-seed draws and resample paired items within the seven fixed tasks, without task resampling; English BPC uses crossed paired seed/document resampling on 1,000 documents. Base is held fixed in every draw. Holm correction covers all nine contrasts; intervals are not simultaneous. Nonsignificance does not establish equivalence. The held-out data had previously been inspected. }
+\label{tab:rebuttal-downstream-inference}
+\end{table*}

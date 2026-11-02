@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+Model & Steps & Trainability & CPT hours $\downarrow$ & LEP hours $\downarrow$ & \shortstack{CPT peak\\allocated GiB $\downarrow$} & \shortstack{LEP peak\\allocated GiB $\downarrow$} \\
+\midrule
+0.6B & 2,000 & Top four & 1.793 & 2.236 & 16.792 & 29.773 \\
+0.6B & 2,000 & Full & 1.932 & 2.370 & 18.916 & 31.898 \\
+0.6B & 5,087 & Top four & 4.530 & 5.654 & 16.792 & 29.773 \\
+0.6B & 5,087 & Full & 4.881 & 6.013 & 18.916 & 31.898 \\
+1.7B & 2,000 & Top four & 2.557 & 3.281 & 21.013 & 34.993 \\
+1.7B & 2,000 & Full & 2.855 & 3.566 & 27.795 & 41.775 \\
+\bottomrule
+\end{tabular}
+\caption{Successful training resources on H100 80GB GPUs for the six predeclared CPT/half-mixture LEP (ours) comparisons. Hours are mean train\_runtime per run over three training seeds, including in-loop validation/checkpoint work; initialization, model/data preparation, final-model save and separate evaluations are excluded. Device allocated memory is the maximum across the three runs, including resident model memory. These values are not total campaign cost: initialization and failed attempts are accounted separately, with missing timing endpoints for quarantined attempts. Matched nominal packed-token budgets do not imply equal actual tokens, text exposure or compute. Full pairs update every parameter; top-four policies differ in embedding-row updates.}
+\label{tab:rebuttal-training-resources}
+\end{table*}

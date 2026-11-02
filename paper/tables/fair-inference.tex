@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Model & Steps & Trainability & $\Delta$ BPC $\downarrow$ & 95\% interval & Holm $p$ \\
+\midrule
+0.6B & 2,000 & Top four & -0.1027 & [-0.1066, -0.0989] & 0.00059994 \\
+0.6B & 2,000 & Full & -0.0986 & [-0.1033, -0.0937] & 0.00059994 \\
+0.6B & 5,087 & Top four & -0.1231 & [-0.1277, -0.1187] & 0.00059994 \\
+0.6B & 5,087 & Full & -0.1029 & [-0.1077, -0.0987] & 0.00059994 \\
+1.7B & 2,000 & Top four & -0.0353 & [-0.0395, -0.0313] & 0.00059994 \\
+1.7B & 2,000 & Full & -0.0611 & [-0.0646, -0.0577] & 0.00059994 \\
+\bottomrule
+\end{tabular}
+\caption{Arabic macro document BPC on 1,500 shared canonical documents, each truncated to at most 512 Unicode characters. Lower BPC is better. LEP (ours) minus CPT for all six trainability comparisons. Negative differences favor LEP. Intervals are 95\% marginal crossed seed/document bootstrap intervals over three paired training seeds and 1,500 shared documents; they are not simultaneous intervals. Holm correction covers the six planned fairness contrasts. The held-out data had previously been inspected. }
+\label{tab:rebuttal-fair-inference}
+\end{table*}

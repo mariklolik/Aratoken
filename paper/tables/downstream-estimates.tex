@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Endpoint & $n$ & Base (fixed) & CPT & LEP \\
+\midrule
+$\uparrow$ ArabicMMLU & 1,000 & 34.5000 & 34.9333 $\pm$ 1.1015 & 32.8000 $\pm$ 0.5292 \\
+$\uparrow$ MadinahQA & 977 & 38.1781 & 38.3146 $\pm$ 1.1274 & 41.2828 $\pm$ 0.5820 \\
+$\uparrow$ ArabicEXAMS & 537 & 29.2365 & 29.7331 $\pm$ 1.2399 & 30.9125 $\pm$ 0.9676 \\
+$\uparrow$ AraTrust & 387 & 53.2300 & 55.4694 $\pm$ 1.1935 & 53.4022 $\pm$ 1.2746 \\
+$\uparrow$ AlGhafa & 1,763 & 40.8395 & 39.4403 $\pm$ 1.0974 & 44.8667 $\pm$ 0.6003 \\
+$\uparrow$ MMLU & 1,000 & 51.8000 & 43.6000 $\pm$ 1.1533 & 47.4333 $\pm$ 0.1528 \\
+$\uparrow$ ARC-Easy & 1,000 & 81.5000 & 73.0667 $\pm$ 2.4420 & 78.4000 $\pm$ 1.1358 \\
+$\uparrow$ Arabic macro & 4,664 & 39.1968 & 39.5782 $\pm$ 1.0701 & 40.6529 $\pm$ 0.3328 \\
+$\uparrow$ English macro & 2,000 & 66.6500 & 58.3333 $\pm$ 1.7323 & 62.9167 $\pm$ 0.5774 \\
+$\downarrow$ English BPC & 1,000 & 1.1941 & 1.2430 $\pm$ 0.0014 & 1.2159 $\pm$ 0.0008 \\
+\bottomrule
+\end{tabular}
+\caption{Qwen3-0.6B with LEP (ours): fixed base and three training seeds per adapted arm at 5,087 steps, top-four policy. Base is one fixed checkpoint, not three independent runs. Adapted values are seed means $\pm$ sample standard deviation (SD). Task accuracies and task macros are percentages (higher is better); macros weight the five Arabic or two English tasks equally. $n$ is the exact item count per task, summed item count for each macro, or document count for BPC. English BPC uses canonical prefixes of at most 512 Unicode characters (lower is better). All 49 checkpoint/task blocks are included. The held-out data had previously been inspected. }
+\label{tab:rebuttal-downstream-estimates}
+\end{table*}

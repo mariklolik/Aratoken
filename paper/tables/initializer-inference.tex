@@ -1,0 +1,25 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Model & Steps & Comparator & $\Delta$ BPC $\downarrow$ & 95\% interval & Holm $p$ \\
+\midrule
+0.6B & 2,000 & Compositional mean & -0.0485 & [-0.0509, -0.0463] & 0.00119988 \\
+0.6B & 2,000 & Moment-matched mean & -0.1251 & [-0.1305, -0.1192] & 0.00119988 \\
+0.6B & 2,000 & Character-ngram analogical proxy & -0.0063 & [-0.0080, -0.0043] & 0.00119988 \\
+0.6B & 2,000 & Random & -0.9159 & [-0.9278, -0.9041] & 0.00119988 \\
+0.6B & 5,087 & Compositional mean & -0.0402 & [-0.0420, -0.0384] & 0.00119988 \\
+0.6B & 5,087 & Moment-matched mean & -0.0984 & [-0.1036, -0.0923] & 0.00119988 \\
+0.6B & 5,087 & Character-ngram analogical proxy & -0.0009 & [-0.0028, +0.0010] & 0.382562 \\
+0.6B & 5,087 & Random & -0.7355 & [-0.7484, -0.7221] & 0.00119988 \\
+1.7B & 2,000 & Compositional mean & -0.0439 & [-0.0460, -0.0418] & 0.00119988 \\
+1.7B & 2,000 & Moment-matched mean & -0.1474 & [-0.1578, -0.1365] & 0.00119988 \\
+1.7B & 2,000 & Character-ngram analogical proxy & -0.0117 & [-0.0135, -0.0097] & 0.00119988 \\
+1.7B & 2,000 & Random & -0.8741 & [-0.8873, -0.8609] & 0.00119988 \\
+\bottomrule
+\end{tabular}
+\caption{Arabic macro document BPC on 1,500 shared canonical documents, each truncated to at most 512 Unicode characters. Lower BPC is better. Half-mixture LEP (ours) minus each initializer comparator, with the top-four training policy. Negative differences favor the half mixture. Intervals are 95\% marginal crossed seed/document bootstrap intervals over three paired training seeds and 1,500 shared documents; they are not simultaneous intervals. Holm correction covers all 12 planned initializer contrasts. The held-out data had previously been inspected. }
+\label{tab:rebuttal-initializer-inference}
+\end{table*}
