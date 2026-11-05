@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Initializer & \shortstack{0.6B / 2,000 steps\\BPC $\downarrow$} & \shortstack{0.6B / 5,087 steps\\BPC $\downarrow$} & \shortstack{1.7B / 2,000 steps\\BPC $\downarrow$} \\
+\midrule
+Compositional mean & 1.4596 $\pm$ 0.0018 & 1.3953 $\pm$ 0.0007 & 1.3664 $\pm$ 0.0042 \\
+Moment-matched mean & 1.5362 $\pm$ 0.0058 & 1.4534 $\pm$ 0.0043 & 1.4698 $\pm$ 0.0085 \\
+Character-ngram analogical proxy & 1.4174 $\pm$ 0.0014 & 1.3560 $\pm$ 0.0012 & 1.3341 $\pm$ 0.0025 \\
+Half mixture (ours) & 1.4111 $\pm$ 0.0003 & 1.3551 $\pm$ 0.0017 & 1.3224 $\pm$ 0.0029 \\
+Random & 2.3270 $\pm$ 0.0082 & 2.0906 $\pm$ 0.0118 & 2.1965 $\pm$ 0.0131 \\
+\bottomrule
+\end{tabular}
+\caption{Arabic macro document BPC on 1,500 shared canonical documents, each truncated to at most 512 Unicode characters. Lower BPC is better. Values are means $\pm$ sample standard deviation (SD) across three paired training seeds. All five predeclared initializers use the top-four training policy. The analogical initializer is a character-ngram proxy. No initializer is selected from these results. The held-out data had previously been inspected. }
+\label{tab:rebuttal-initializer-ar}
+\end{table*}

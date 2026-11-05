@@ -12,7 +12,7 @@ def label_costs(tok) -> dict:
                         "bytes": len((" " + lbl).encode("utf-8"))}
                   for lbl in cfg["labels"].values()}
            for name, cfg in DATASETS.items()}
-    arm["_letters"] = {c: len(tok(" " + c, add_special_tokens=False).input_ids) for c in LETTERS[:4]}
+    arm["_letters"] = {c: len(tok(" " + c, add_special_tokens=False).input_ids) for c in LETTERS}
     return arm
 
 

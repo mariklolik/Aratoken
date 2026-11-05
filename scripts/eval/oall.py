@@ -1,26 +1,32 @@
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
 import torch
 from datasets import load_dataset
+from huggingface_hub import snapshot_download
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from scripts.eval.classification import LETTERS
+from scripts.eval.inference import artifact_hashes
+
 PROMPT = "السؤال: {q}\nالإجابة:"
 CONTEXT = "{c}\nالسؤال: {q}\nالإجابة:"
-LETTERS = ["أ", "ب", "ج", "د", "هـ"]
 EN_LETTERS = ["A", "B", "C", "D", "E"]
 EN_PROMPT = "Question: {q}\nAnswer:"
 MCQ = "السؤال: {q}\n{opts}\nالإجابة:"
 
 
 def _mbzuai(rec: dict) -> tuple[str, list[str], int] | None:
-    opts = [rec[f"Option {i}"] for i in range(1, 6)]
-    opts = [o for o in opts if o and o != "None"]
-    gold = "ABCDE".find(rec["Answer Key"])
-    if gold < 0 or gold >= len(opts):
+    options = {key: rec[f"Option {i}"] for i, key in enumerate("ABCDE", 1)}
+    keys = [key for key, value in options.items() if value and value != "None"]
+    answer = str(rec["Answer Key"]).strip()
+    if answer not in keys:
         return None
+    opts = [options[key] for key in keys]
+    gold = keys.index(answer)
     ctx = rec.get("Context")
     q = (CONTEXT.format(c=ctx, q=rec["Question"]) if ctx and ctx != "None"
          else PROMPT.format(q=rec["Question"]))
@@ -28,10 +34,12 @@ def _mbzuai(rec: dict) -> tuple[str, list[str], int] | None:
 
 
 def _letters(rec: dict, keys: str, answer_col: str) -> tuple[str, list[str], int] | None:
-    opts = [rec[k] for k in keys if rec.get(k)]
-    gold = keys.find(str(rec[answer_col]).strip()[:1])
-    if gold < 0 or gold >= len(opts):
+    valid_keys = [key for key in keys if rec.get(key)]
+    answer = str(rec[answer_col]).strip()[:1]
+    if answer not in valid_keys:
         return None
+    opts = [rec[key] for key in valid_keys]
+    gold = valid_keys.index(answer)
     return PROMPT.format(q=rec["Question" if "Question" in rec else "question"]), opts, gold
 
 
@@ -82,8 +90,63 @@ EN_TASKS = [
 ARABIC_LETTERS = {"أ": "A", "ب": "B", "ج": "C"}
 
 
+def json_hash(value) -> str:
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
+                                    separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+
+
+def resolve_artifact(path: str) -> Path:
+    return Path(path if Path(path).exists() else snapshot_download(path, local_files_only=True)).resolve()
+
+
+def artifact_hash(path: Path, kind: str) -> str:
+    patterns = (["config.json", "*.safetensors", "pytorch_model*.bin", "*.index.json"]
+                if kind == "model" else ["tokenizer*", "special_tokens_map.json", "added_tokens.json",
+                                         "vocab.*", "merges.txt", "spiece.model"])
+    hashes = artifact_hashes(str(path), patterns)
+    if not hashes:
+        raise ValueError(f"No {kind} files found in {path}")
+    return json_hash(hashes)
+
+
+def task_items(repo, configs, split, adapt, limit):
+    items, excluded, sources = [], [], []
+    for cfg in configs:
+        ds = load_dataset(repo, cfg, split=split)
+        if limit:
+            ds = ds.select(range(min(limit, len(ds))))
+        sources.append({"repo": repo, "config": cfg, "split": split,
+                        "fingerprint": ds._fingerprint, "selected_rows": len(ds),
+                        "cache_files": ds.cache_files})
+        for index, rec in enumerate(ds):
+            identity = {"repo": repo, "config": cfg, "split": split,
+                        "row_index": index, "source_sha256": json_hash(rec)}
+            if repo.endswith("AraTrust-categorized"):
+                rec = dict(rec)
+                rec["Answer"] = ARABIC_LETTERS.get(str(rec["Answer"]).strip()[:1], rec["Answer"])
+            item = adapt(rec)
+            if item is None:
+                excluded.append({**identity, "reason": "adapter rejected invalid or missing gold"})
+                continue
+            prompt, choices, gold = item
+            accepted = {**identity, "prompt": prompt, "choices": choices, "gold": gold}
+            items.append({**accepted, "item_sha256": json_hash(accepted)})
+    return items, excluded, sources
+
+
+def evaluation_protocol(lang: str, limit: int, mode: str) -> dict:
+    paths = [Path(__file__).with_name(name) for name in ("oall.py", "classification.py", "inference.py")]
+    return {"name": "continuation-v2", "lang": lang, "limit": limit,
+            "dtype": "bfloat16", "mode": mode,
+            "rotation": "accepted item index modulo options" if mode == "mcq" else "none",
+            "score": "sum log probability / raw UTF-8 bytes including leading space",
+            "source_sha256": json_hash({p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths})}
+
+
 def as_mcq(prompt: str, choices: list[str], letters: list[str],
            rotate: int = 0) -> tuple[str, list[str], list[int]]:
+    if not 1 <= len(choices) <= len(letters):
+        raise ValueError(f"unsupported choice count: {len(choices)}")
     body = prompt.split("\n")
     stem = "\n".join(body[:-1]) if len(body) > 1 else body[0]
     tail = "الإجابة:" if letters is LETTERS else "Answer:"
@@ -133,46 +196,54 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     a = parse_args()
-    tok = AutoTokenizer.from_pretrained(a.tokenizer or a.model, trust_remote_code=True)
+    model_path, tokenizer_path = resolve_artifact(a.model), resolve_artifact(a.tokenizer or a.model)
+    model_digest, tokenizer_digest = artifact_hash(model_path, "model"), artifact_hash(tokenizer_path, "tokenizer")
+    tok = AutoTokenizer.from_pretrained(tokenizer_path, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
-        a.model, torch_dtype=torch.bfloat16, trust_remote_code=True).to(a.device).eval()
+        model_path, torch_dtype=torch.bfloat16, trust_remote_code=True).to(a.device).eval()
 
     a.out = a.out / a.protocol / a.lang if a.lang == "en" else a.out / a.protocol
     a.out.mkdir(parents=True, exist_ok=True)
     summary: dict[str, float] = {}
     letters = EN_LETTERS if a.lang == "en" else LETTERS
+    protocol = evaluation_protocol(a.lang, a.limit, a.protocol)
     for task, repo, configs, split, adapt in (EN_TASKS if a.lang == "en" else TASKS):
+        items, excluded, sources = task_items(repo, configs, split, adapt, a.limit)
+        if not items:
+            raise ValueError(f"No valid items for {task}")
+        hashes = [item["item_sha256"] for item in items]
+        golds = [item["gold"] for item in items]
+        receipt = {"task": task, "model": str(model_path), "tokenizer": str(tokenizer_path),
+                   "model_sha256": model_digest, "tokenizer_sha256": tokenizer_digest,
+                   "n": len(items), "item_sha256": hashes, "cohort_sha256": json_hash(hashes),
+                   "protocol": protocol}
         done = a.out / f"{a.tag}_{task}.json"
         if done.exists():
-            summary[task] = json.loads(done.read_text())["accuracy"]
+            cached = json.loads(done.read_text())
+            predictions = cached.get("y_pred", [])
+            if (any(cached.get(k) != v for k, v in receipt.items()) or cached.get("y_true") != golds
+                    or len(predictions) != len(items)
+                    or any(type(p) is not int or not 0 <= p < len(item["choices"])
+                           for p, item in zip(predictions, items))
+                    or cached.get("accuracy") != sum(t == p for t, p in zip(golds, predictions)) / len(items)):
+                raise ValueError(f"Invalid or stale evaluation cache: {done}")
+            summary[task] = cached["accuracy"]
             print(f"  {task:14} acc {summary[task]:.4f}  (cached)", flush=True)
             continue
         y_true, y_pred = [], []
-        for cfg in configs:
-            ds = load_dataset(repo, cfg, split=split)
-            if a.limit:
-                ds = ds.select(range(min(a.limit, len(ds))))
-            for rec in tqdm(ds, desc=f"{a.tag} {task}/{cfg}"):
-                if repo.endswith("AraTrust-categorized"):
-                    rec = dict(rec)
-                    rec["Answer"] = ARABIC_LETTERS.get(
-                        str(rec["Answer"]).strip()[:1], rec["Answer"])
-                item = adapt(rec)
-                if item is None:
-                    continue
-                prompt, choices, gold = item
-                order = list(range(len(choices)))
-                if a.protocol == "mcq":
-                    prompt, choices, order = as_mcq(prompt, choices, letters,
-                                                    rotate=len(y_true))
-                y_true.append(gold)
-                pick = best_choice(prompt, choices, tok, model, a.device)
-                y_pred.append(order[pick])
+        for item in tqdm(items, desc=f"{a.tag} {task}"):
+            prompt, choices, gold = item["prompt"], item["choices"], item["gold"]
+            order = list(range(len(choices)))
+            if a.protocol == "mcq":
+                prompt, choices, order = as_mcq(prompt, choices, letters, rotate=len(y_true))
+            y_true.append(gold)
+            pick = best_choice(prompt, choices, tok, model, a.device)
+            y_pred.append(order[pick])
         acc = sum(t == p for t, p in zip(y_true, y_pred)) / max(len(y_true), 1)
         summary[task] = acc
         (a.out / f"{a.tag}_{task}.json").write_text(
-            json.dumps({"task": task, "model": a.model, "accuracy": acc,
-                        "n": len(y_true), "y_true": y_true, "y_pred": y_pred}),
+            json.dumps({**receipt, "accuracy": acc, "y_true": y_true, "y_pred": y_pred,
+                        "excluded": excluded, "data_sources": sources}),
             encoding="utf-8")
         print(f"  {task:14} acc {acc:.4f}  (n={len(y_true)})", flush=True)
 

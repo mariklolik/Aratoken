@@ -92,6 +92,18 @@ def paper_normalizer(preserve_alif: bool = True):
         lowercase_latin=True, preserve_alif_variants=preserve_alif))
 
 
+def canonical_text(text: str, limit: int) -> str:
+    if limit < 1:
+        raise ValueError("character limit must be positive")
+    normalizer = paper_normalizer(preserve_alif=True)
+    for _ in range(8):
+        normalized = normalizer.normalize_str(text)
+        if normalized == text:
+            return normalized[:limit]
+        text = normalized
+    raise ValueError("paper normalization did not converge within eight passes")
+
+
 def describe_normalizer(config: ArabicNormalizerConfig) -> Dict[str, Any]:
     return {
         "unicode_normalization": config.unicode_normalization,

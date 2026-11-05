@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+Model & Steps & Trainability & CPT Arabic $\downarrow$ & LEP Arabic $\downarrow$ & CPT English $\downarrow$ & LEP English $\downarrow$ \\
+\midrule
+0.6B & 2,000 & Top four & 1.5138 $\pm$ 0.0005 & 1.4111 $\pm$ 0.0003 & 1.2249 $\pm$ 0.0014 & 1.2080 $\pm$ 0.0006 \\
+0.6B & 2,000 & Full & 1.3780 $\pm$ 0.0009 & 1.2794 $\pm$ 0.0039 & 1.3407 $\pm$ 0.0103 & 1.2945 $\pm$ 0.0070 \\
+0.6B & 5,087 & Top four & 1.4782 $\pm$ 0.0004 & 1.3551 $\pm$ 0.0017 & 1.2430 $\pm$ 0.0014 & 1.2159 $\pm$ 0.0008 \\
+0.6B & 5,087 & Full & 1.3226 $\pm$ 0.0022 & 1.2197 $\pm$ 0.0006 & 1.3669 $\pm$ 0.0030 & 1.3090 $\pm$ 0.0025 \\
+1.7B & 2,000 & Top four & 1.3577 $\pm$ 0.0010 & 1.3224 $\pm$ 0.0029 & 1.0842 $\pm$ 0.0033 & 1.0721 $\pm$ 0.0011 \\
+1.7B & 2,000 & Full & 1.2699 $\pm$ 0.0009 & 1.2088 $\pm$ 0.0010 & 1.1207 $\pm$ 0.0024 & 1.1183 $\pm$ 0.0039 \\
+\bottomrule
+\end{tabular}
+\caption{Arabic macro document BPC on 1,500 shared canonical documents, each truncated to at most 512 Unicode characters. Lower BPC is better. Values are means $\pm$ sample standard deviation (SD) across three paired training seeds. English uses 1,000 canonical documents with the same prefix rule and is descriptive. Top-four LEP updates new embedding rows and the last four transformer layers; CPT updates all original embedding rows and the same layers. Full pairs update all parameters. LEP (ours) uses the predeclared half mixture. Matched nominal packed-token budgets do not imply equal compute or text exposure. The held-out data had previously been inspected. }
+\label{tab:rebuttal-fair-estimates}
+\end{table*}

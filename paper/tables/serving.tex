@@ -1,0 +1,25 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+Model & Batch & \shortstack{Mean end-to-end\\s/batch $\downarrow$} & \shortstack{Generation\\tokens/s $\uparrow$} & \shortstack{Generated\\characters/s $\uparrow$} & \shortstack{Peak allocated\\GiB $\downarrow$} & \shortstack{Peak reserved\\GiB $\downarrow$} \\
+\midrule
+0.6B Base & 1 & 2.082 & 61.51 & 145.56 & 1.170 & 1.195 \\
+0.6B Base & 4 & 2.243 & 228.46 & 543.60 & 1.259 & 1.344 \\
+0.6B CPT & 1 & 2.082 & 61.53 & 147.67 & 1.170 & 1.195 \\
+0.6B CPT & 4 & 2.244 & 228.35 & 555.14 & 1.259 & 1.348 \\
+0.6B LEP & 1 & 2.079 & 61.61 & 243.61 & 1.415 & 1.439 \\
+0.6B LEP & 4 & 2.256 & 227.09 & 864.41 & 1.489 & 1.582 \\
+1.7B Base & 1 & 2.127 & 60.21 & 147.55 & 3.265 & 3.279 \\
+1.7B Base & 4 & 2.271 & 225.67 & 564.12 & 3.353 & 3.445 \\
+1.7B CPT & 1 & 2.249 & 56.95 & 138.58 & 3.265 & 3.279 \\
+1.7B CPT & 4 & 2.454 & 208.78 & 504.77 & 3.353 & 3.445 \\
+1.7B LEP & 1 & 2.300 & 55.67 & 212.71 & 3.759 & 3.771 \\
+1.7B LEP & 4 & 2.475 & 206.99 & 763.33 & 3.832 & 3.912 \\
+\bottomrule
+\end{tabular}
+\caption{Descriptive serving measurements including LEP (ours) on one H100 80GB GPU, in the displayed model order. All models use the same 32 canonical Arabic prompts of 256 Unicode characters, 128 greedy new tokens, batches 1 and 4, two warmup batches per batch size, brain floating-point 16 (BF16), left padding and key--value (KV) caching, without end-of-sequence (EOS) stopping. Bases are fixed checkpoints rerun in this sequence; adapted checkpoints use predeclared training seed 1 (0.6B: 5,087 steps; 1.7B: 2,000 steps; top-four policy). Mean end-to-end seconds per batch equals total end-to-end time divided by 32 or 8 measured batches, respectively; it is not per-request latency. End-to-end includes tokenization, host/device transfers, generation and text decoding, excluding model loading. Throughput uses 4,096 generated tokens or the observed decoded Unicode-character count, respectively, divided by total generation time. Memory is maximum device allocated/reserved memory across batches, including the model. Generated content differs and can repeat after EOS; character throughput is content-dependent and is not quality-adjusted utility or equal-output latency. Full phase timings and generated content are retained in the raw records. No serving significance claim is made.}
+\label{tab:rebuttal-serving}
+\end{table*}

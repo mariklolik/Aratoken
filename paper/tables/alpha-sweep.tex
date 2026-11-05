@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+$\alpha$ & Initializer & Arabic BPC $\downarrow$ & English BPC $\downarrow$ \\
+\midrule
+0.00 & Character-ngram analogical proxy & 1.4174 $\pm$ 0.0014 & 1.2069 $\pm$ 0.0007 \\
+0.25 & Quarter compositional & 1.4052 $\pm$ 0.0007 & 1.2090 $\pm$ 0.0007 \\
+0.50 & Half mixture (ours) & 1.4111 $\pm$ 0.0003 & 1.2080 $\pm$ 0.0006 \\
+0.75 & Three-quarters compositional & 1.4289 $\pm$ 0.0006 & 1.2069 $\pm$ 0.0004 \\
+1.00 & Compositional mean & 1.4596 $\pm$ 0.0018 & 1.2087 $\pm$ 0.0008 \\
+\bottomrule
+\end{tabular}
+\caption{Arabic macro document BPC on 1,500 shared canonical documents, each truncated to at most 512 Unicode characters. Lower BPC is better. Values are means $\pm$ sample standard deviation (SD) across three paired training seeds. Complete exploratory five-point mixture sweep at 0.6B, 2,000 steps, top-four training. $\alpha$ weights the compositional component; $1-\alpha$ weights the character-ngram analogical proxy. Endpoints reuse the component runs. The predeclared primary value remains $\alpha=0.5$. English uses 1,000 canonical documents with the same prefix rule and is descriptive. The held-out data had previously been inspected. }
+\label{tab:rebuttal-alpha}
+\end{table*}

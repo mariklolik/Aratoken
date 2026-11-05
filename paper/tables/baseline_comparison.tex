@@ -3,12 +3,12 @@
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\fitcolumn{\begin{tabular}{@{}lrrrr@{}}
+\fitcolumn{\fitcolumn{\begin{tabular}{@{}lrrrr@{}}
 \toprule
 \textbf{Tokenizer} & \textbf{Vocab} & \multicolumn{2}{c}{\textbf{Fertility} $\downarrow$} & \textbf{Compr.} $\uparrow$ \\
  & & raw & norm. & norm. \\
 \midrule
-Qwen2.5 / Qwen3 & 151{,}665 & 2.283 & 2.179 & 2.669 \\
+Qwen2.5 & 151{,}665 & 2.283 & 2.179 & 2.669 \\
 DeepSeek-V3 & 128{,}815 & 2.238 & 2.177 & 2.670 \\
 AraBERT & 64{,}000 & 1.796 & 1.833 & 3.170 \\
 \midrule
@@ -20,7 +20,7 @@ AraToken, 99\% coverage & 109{,}844 & 1.380 & 1.227 & 4.745 \\
 \textbf{AraToken, 150K} & 150{,}000 & \textbf{1.366} & \textbf{1.212} & \textbf{4.802} \\
 AraToken, 150K, byte fallback & 150{,}000 & 1.512 & 1.215 & 4.792 \\
 \bottomrule
-\end{tabular}}
-\caption{AraToken against existing tokenizers on the \texttt{test} split. Fertility is tokens per word and compression is characters per token, both as per-document means. Every tokenizer is measured on raw text and on text normalized by the AraToken pipeline. The best values are in bold.}
+\end{tabular}}}
+\caption{AraToken (ours) against existing tokenizers on 5{,}000 \texttt{test} documents. Fertility is tokens per word and compression is characters per token, both as per-document means. Every tokenizer is measured on raw text and on common text normalized by the AraToken pipeline. Qwen3 has 151{,}669 token IDs and the same displayed scores as Qwen2.5. The best values are in bold.}
 \label{tab:baseline_comparison}
 \end{table}
